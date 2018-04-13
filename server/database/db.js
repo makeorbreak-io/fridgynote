@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 function connect() {
     const connectionString = fs.readFileSync('./database/config.txt').toString();
     console.log(connectionString)
-    mongoose.connect(connectionString,{dbName:'fridgynote'})
+    mongoose.connect(connectionString, { dbName: 'fridgynote' })
         .then(() => {
             console.log('Database Connected')
         })
@@ -24,14 +24,14 @@ const textNoteSchema = new Schema({
     owner: userTagSchema,
     shared: [userTagSchema],
     labels: []
-})
+}, { versionKey: false })
 
 const listNoteSchema = new Schema({
     title: String,
     items: [String],
     owner: userTagSchema,
     shared: [userTagSchema]
-})
+}, { versionKey: false })
 
 const listItemSchema = new Schema({
     body: String,
@@ -39,7 +39,7 @@ const listItemSchema = new Schema({
     owner: String,
     shared: [String],
     tagId: String
-})
+}, { versionKey: false })
 
 const TextNote = mongoose.model('text_note', textNoteSchema);
 const ListNote = mongoose.model('list_note', listNoteSchema);
@@ -113,16 +113,36 @@ function populate() {
 
 }
 
-function createNewListItem(body,listId,owner,shared,tagId){
+function createNewListItem(body, listId, owner, shared, tagId) {
     const item = new ListItem({
-        body:body,
-        listId:listId,
-        owner:owner,
-        tagId:tagId,
-        shared:shared
+        body: body,
+        listId: listId,
+        owner: owner,
+        tagId: tagId,
+        shared: shared
     })
     return item.save()
 }
 
-module.exports = { connect, populate,createNewListItem }
+
+function getNoteByUser(userId) {
+
+    var promise1 = TextNote.find({ $or: [{ 'owner.userId': userId }, { shared: { $elemMatch: { userId: userId } } }] });
+
+    var promise2 = ListNote.find({ $or: [{ 'owner.userId': userId }, { shared: { $elemMatch: { userId: userId } } }] });
+
+    var promise3 = ListItem.find({ $or: [{ owner: userId }, { shared: userId }] });
+
+    return Promise.all([promise1, promise2, promise3]).then(function (values) {
+        const joined = {
+            'textNote': values[0],
+            'listNote': values[1], 
+            'listItem': values[2],
+        }
+
+        return Promise.resolve(joined);
+    });
+};
+
+module.exports = { connect, populate, createNewListItem, getNoteByUser }
 

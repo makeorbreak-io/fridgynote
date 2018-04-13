@@ -3,10 +3,22 @@ var router = express.Router();
 const db = require('../database/db')
 const { check,validationResult } = require('express-validator/check');
 
+router.get('/me',check('Authorization').exists(),function(req, res){
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+      }
+
+      db.getNoteByUser(req.get('Authorization'))
+      .then(result => res.json(result))
+      .catch((err) => res.status(400).end())
+
+})
+
+
 router.post('/item', [check('body').exists(), check('listId').exists(), check('Authorization').exists(), check('tagId').exists()], function (req, res, next) {
     const errors = validationResult(req);
-
-    console.log(errors);
 
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
