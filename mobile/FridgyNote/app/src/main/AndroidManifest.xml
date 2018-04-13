@@ -34,7 +34,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"></activity>
-        <activity android:name=".activities.NewTagActivity"></activity>
+        <activity android:name=".activities.NewTagActivity"
+            android:label="New Tag"></activity>
     </application>
 
 </manifest>

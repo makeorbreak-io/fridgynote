@@ -7,4 +7,15 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="tag_id">Tag ID:</string>
+    <string name="defaulttagidtext">tag_id</string>
+    <string name="title">Title:</string>
+    <string name="tag_title">Tag Title</string>
+    <string name="type">Type:</string>
+
+    <string-array name="tag_types">
+        <item>Notes</item>
+        <item>Shopping Item</item>
+        <item>Reminder</item>
+    </string-array>
 </resources>

@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
         String readTagContent = null;
         try {
             mNfcWrapper = new NfcWrapper(this);
-            readTagContent = mNfcWrapper.handleIntent(getIntent());
-            Log.d(TAG, "start read " + readTagContent);
+            String readTag = mNfcWrapper.handleIntent(getIntent());
+            Log.d(TAG, "Activity start read => " + readTag);
+            TagHandler.handleTag(this, readTag);
         } catch (NfcWrapper.NfcWrapperException e) {
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -78,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         if (mNfcWrapper != null) {
-            String res = mNfcWrapper.handleIntent(intent);
-            Log.d(TAG, "handle " + res);
+            String readTag = mNfcWrapper.handleIntent(intent);
+            Log.d(TAG, "Activity active read => " + readTag);
+            TagHandler.handleTag(this, readTag);
         }
     }
 
