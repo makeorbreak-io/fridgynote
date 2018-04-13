@@ -1,4 +1,4 @@
-package com.bitsplease.fridgynote;
+package com.bitsplease.fridgynote.utils;
 
 /**
  * Created by André on 13/04/2018.
