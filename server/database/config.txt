@@ -1,0 +1,1 @@
+mongodb://jadmin:pwd1231pwd@jarvis-iot.ml:27017/fridgynote
