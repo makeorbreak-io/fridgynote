@@ -50,22 +50,6 @@ public class NfcWrapper {
                 Log.d(TAG, "Wrong mime type: " + type);
             }
         }
-        /* **IN CASE WE SUPPORT NEW TAGS**
-
-        else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
-
-            // In case we would still use the Tech Discovered Intent
-            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            String[] techList = tag.getTechList();
-            String searchedTech = Ndef.class.getName();
-
-            for (String tech : techList) {
-                if (searchedTech.equals(tech)) {
-                    new NdefReaderTask().execute(tag);
-                    break;
-                }
-            }
-        }*/
         return null;
     }
 
