@@ -118,15 +118,14 @@ function populate() {
 
 }
 
-function createNewListItem(body, listId, owner, shared, tagId) {
-    const item = new ListItem({
+function createNewListItem(body, listId, owner, shared = [], tagId) {
+    return ListItem.findOneAndUpdate({ owner: owner, tagId: tagId }, {
         body: body,
         listId: listId,
         owner: owner,
         tagId: tagId,
         shared: shared
-    })
-    return item.save()
+    }, { upsert: true })
 }
 
 
@@ -138,6 +137,10 @@ function createNewListNote(title, items, ownerId, tagId, shared) {
         shared: shared
     })
     return note.save()
+}
+
+function editListNote(listNoteId,title,items,shared){
+    
 }
 
 function processListItem(ownerId, tagId) {

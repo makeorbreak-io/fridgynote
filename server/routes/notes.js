@@ -28,6 +28,7 @@ router.post('/item', [check('body').exists(), check('listId').exists(), check('A
             res.json(listItem)
         })
         .catch((err) => {
+            console.log(err)
             res.status(400).end()
         })
 });
