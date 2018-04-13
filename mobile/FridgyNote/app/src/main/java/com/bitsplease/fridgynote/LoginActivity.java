@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Mime;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 
@@ -28,16 +29,26 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity {
-    public static final String TAG = "FN-LoginActivity";
+    private static final String TAG = "FN-LoginActivity";
 
     private NfcWrapper mNfcWrapper;
-
     SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        try {
+            mNfcWrapper = new NfcWrapper(this);
+            String readTag = mNfcWrapper.handleIntent(getIntent());
+            Log.d(TAG, "Activity start read => " + readTag);
+            // this call may end the activity
+            TagHandler.handleTag(this, readTag);
+        } catch (NfcWrapper.NfcWrapperException e) {
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
 
         sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         if(!sharedPreferences.getString(Constants.KEY_USERNAME, "").equals("")){
@@ -80,16 +91,6 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-
-        try {
-            mNfcWrapper = new NfcWrapper(this);
-            String res = mNfcWrapper.handleIntent(getIntent());
-            Log.d(TAG, "init " + res);
-        } catch (NfcWrapper.NfcWrapperException e) {
-            e.printStackTrace();
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-            finish();
-        }
     }
 
     @Override
@@ -113,7 +114,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         if (mNfcWrapper != null) {
             String res = mNfcWrapper.handleIntent(intent);
-            Log.d(TAG, "handle " + res);
+            Log.d(TAG, "Activity active read => " + res);
+            TagHandler.handleTag(this, res);
         }
     }
 }
