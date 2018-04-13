@@ -9,6 +9,14 @@ public class BackendConnector {
         return false;
     }
 
+    public static TextNote getTextNote(String noteId) {
+        List<String> images = new ArrayList<>();
+        images.add("https://pbs.twimg.com/profile_images/949374088249671680/MuxDEZpD_400x400.jpg");
+        images.add("https://upload.wikimedia.org/wikipedia/commons/0/0f/Eiffel_Tower_Vertical.JPG");
+        images.add("https://ironcodestudio.com/wp-content/uploads/2015/03/css-remove-horizontal-scrollbar.jpg");
+        return new TextNote(noteId, "Notinha", "Cenas cenas cenas", images);
+    }
+
     public static List<NoteTag> getNoteTags() {
         List<NoteTag> res = new ArrayList<>();
         res.add(new NoteTag("fridgynote1", "room"));
@@ -19,8 +27,8 @@ public class BackendConnector {
 
     public static List<ListNote> getListNotes() {
         List<ListNote> res = new ArrayList<>();
-        res.add(new ListNote("Personal Shopping"));
-        res.add(new ListNote("Family Shopping"));
+        res.add(new ListNote("id", "Personal Shopping"));
+        res.add(new ListNote("id", "Family Shopping"));
         return res;
     }
 

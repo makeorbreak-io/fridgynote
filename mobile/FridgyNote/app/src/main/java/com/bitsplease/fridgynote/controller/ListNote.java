@@ -3,8 +3,8 @@ package com.bitsplease.fridgynote.controller;
 public class ListNote extends Note {
     private String mName;
 
-    public ListNote(String name) {
-        super();
+    public ListNote(String id, String name) {
+        super(id);
         mName = name;
     }
 

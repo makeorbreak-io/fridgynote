@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.bitsplease.fridgynote.activities.NewTagActivity;
+import com.bitsplease.fridgynote.activities.TextNoteActivity;
 import com.bitsplease.fridgynote.utils.Constants;
 
 public class TagHandler {

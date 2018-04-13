@@ -5,4 +5,13 @@ package com.bitsplease.fridgynote.controller;
  */
 
 public class Note {
+    private String mId;
+
+    public Note(String id) {
+        mId = id;
+    }
+
+    public final String getId() {
+        return mId;
+    }
 }
