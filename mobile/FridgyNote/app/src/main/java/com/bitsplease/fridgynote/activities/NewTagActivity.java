@@ -1,5 +1,6 @@
 package com.bitsplease.fridgynote.activities;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,23 +14,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitsplease.fridgynote.R;
+import com.bitsplease.fridgynote.controller.BackendConnector;
+import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Constants;
+import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NewTagActivity extends AppCompatActivity {
+    private static final String TAG = "FN-NewTagActivity";
 
     private FloatingActionButton saveButton;
     private TextView tagIdText;
+    private TextView tagTitleText;
     private TextView selectListText;
     private Spinner spinner;
     private Spinner selectListSpinner;
 
     private NfcWrapper mNfcWrapper;
     private String tagId;
+    private List<ListNote> listNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +61,55 @@ public class NewTagActivity extends AppCompatActivity {
         spinner = findViewById(R.id.tag_type_spinner);
         selectListSpinner = findViewById(R.id.select_list_spinner);
         selectListText = findViewById(R.id.select_list_text);
+        tagTitleText = findViewById(R.id.tag_title_text);
 
         tagIdText.setText(tagId);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO check values are correct and save tag
+                if (tagTitleText == null || tagTitleText.getText().length() == 0) {
+                    DialogHelper.showOkDialog(NewTagActivity.this,
+                            "You must choose a title for the NFC tag.");
+                    return;
+                }
+                String tagId = tagIdText.getText().toString();
+                String tagTitle = tagTitleText.getText().toString();
+                int type = spinner.getSelectedItemPosition();
+                switch (type) {
+                    case 0:
+                        // NOTE TAG
+                        boolean noteCreated = BackendConnector.createNoteTag(tagId, tagTitle);
+                        if(noteCreated) {
+                            Toast.makeText(NewTagActivity.this, "Note tag created", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            DialogHelper.showOkDialog(NewTagActivity.this, "Unable to create note.");
+                        }
+                        break;
+                    case 1:
+                        // SHOPPING ITEM TAG
+                        boolean shoppingCreated = BackendConnector.createShoppingItemTag(tagId, tagTitle,
+                                listNotes.get(selectListSpinner.getSelectedItemPosition()));
+                        if(shoppingCreated) {
+                            Toast.makeText(NewTagActivity.this, "Shopping item tag created", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            DialogHelper.showOkDialog(NewTagActivity.this, "Unable to create shopping item.");
+                        }
+                        break;
+                    case 2:
+                        // REMINDER TAG
+                        boolean reminderCreated = BackendConnector.createReminderTag(tagId, tagTitle);
+                        if(reminderCreated) {
+                            Toast.makeText(NewTagActivity.this, "Reminder tag created", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            DialogHelper.showOkDialog(NewTagActivity.this, "Unable to create reminder.");
+                        }
+                        break;
+                }
+                // TODO save tag
             }
         });
 
@@ -84,14 +133,43 @@ public class NewTagActivity extends AppCompatActivity {
             }
         });
 
-        // TODO get available lists
-        List<String> list = new ArrayList<String>();
-        list.add("list 1");
-        list.add("list 2");
-        list.add("list 3");
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+        List<String> list = new ArrayList<>();
+        listNotes = BackendConnector.getListNotes();
+        for (ListNote note : listNotes) {
+            list.add(note.getName());
+        }
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectListSpinner.setAdapter(dataAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mNfcWrapper != null) {
+            mNfcWrapper.setupForegroundDispatch();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (mNfcWrapper != null) {
+            mNfcWrapper.stopForegroundDispatch();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (mNfcWrapper != null) {
+            String res = mNfcWrapper.handleIntent(intent);
+            Log.d(TAG, "Activity active read => " + res);
+            if (!BackendConnector.isTagKnown(res)) {
+                tagIdText.setText(res);
+            }
+        }
     }
 }

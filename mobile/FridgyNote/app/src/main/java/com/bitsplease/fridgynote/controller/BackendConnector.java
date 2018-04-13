@@ -17,7 +17,29 @@ public class BackendConnector {
         return res;
     }
 
+    public static List<ListNote> getListNotes() {
+        List<ListNote> res = new ArrayList<>();
+        res.add(new ListNote("Personal Shopping"));
+        res.add(new ListNote("Family Shopping"));
+        return res;
+    }
+
     public static List<Note> getUnassignedNodes() {
         return new ArrayList<>();
+    }
+
+    public static boolean createNoteTag(String tagId, String name) {
+        // TODO codar
+        return false;
+    }
+
+    public static boolean createReminderTag(String tagId, String name) {
+        // TODO codar
+        return false;
+    }
+
+    public static boolean createShoppingItemTag(String tagId, String name, ListNote listNote) {
+        // TODO codar
+        return false;
     }
 }

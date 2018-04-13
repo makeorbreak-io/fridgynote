@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.Mime;
@@ -32,7 +33,15 @@ public class LoginActivity extends AppCompatActivity {
             String readTag = mNfcWrapper.handleIntent(getIntent());
             Log.d(TAG, "Activity start read => " + readTag);
             // this call may end the activity
-            TagHandler.handleTag(this, readTag);
+            if(readTag != null && !BackendConnector.isTagKnown(readTag)) {
+                Log.d(TAG, "here");
+                TagHandler.launchNewTagActivity(this, readTag);
+                finish();
+                return;
+            } else {
+                Log.d(TAG, "here2");
+                TagHandler.handleTag(this, readTag);
+            }
         } catch (NfcWrapper.NfcWrapperException e) {
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
