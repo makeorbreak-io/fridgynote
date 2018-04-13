@@ -141,7 +141,7 @@ function createNewListNote(title, items, ownerId, tagId, shared) {
 }
 
 function processListItem(ownerId, tagId) {
-    ListItem.findOne({ owner: ownerId, tagId: tagId })
+    return ListItem.findOne({ owner: ownerId, tagId: tagId })
         .then((listItem) => {
             return ListNote.findById(listItem.listId)
                 .then((listNote) => {
@@ -153,7 +153,7 @@ function processListItem(ownerId, tagId) {
                     } else {
                         listNote.items[index].checked = false;
                     }
-                    listNote.save();
+                    return listNote.save();
                 })
         })
 }
@@ -178,7 +178,6 @@ function getNoteByUser(userId) {
     });
 };
 
-processListItem("tostas","fridgynote3");
 
 module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewListNote }
 

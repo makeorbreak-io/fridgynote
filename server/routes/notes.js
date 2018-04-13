@@ -39,6 +39,9 @@ router.post('/processItem', [check('tagId').exists(), check('Authorization').exi
         return res.status(422).json({ errors: errors.mapped() });
     }
 
+    db.processListItem()
+    .then(result => res.json(result))
+    .catch((err) => res.status(400).end())
 
 });
 
