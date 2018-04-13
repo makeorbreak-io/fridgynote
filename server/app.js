@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 db.connect();
-db.populate();
+//db.populate();
 
 app.use('/', indexRouter);
 
