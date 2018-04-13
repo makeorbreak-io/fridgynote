@@ -140,6 +140,24 @@ function createNewListNote(title, items, ownerId, tagId, shared) {
     return note.save()
 }
 
+function processListItem(ownerId, tagId) {
+    ListItem.findOne({ owner: ownerId, tagId: tagId })
+        .then((listItem) => {
+            return ListNote.findById(listItem.listId)
+                .then((listNote) => {
+                    const index = listNote.items.findIndex(function (element, index, array) {
+                        return element.checked == true && element.body == listItem.body;
+                    })
+                    if (index == -1) {
+                        listNote.items.push({ checked: false, body: listItem.body })
+                    } else {
+                        listNote.items[index].checked = false;
+                    }
+                    listNote.save();
+                })
+        })
+}
+
 
 function getNoteByUser(userId) {
 
@@ -159,6 +177,8 @@ function getNoteByUser(userId) {
         return Promise.resolve(joined);
     });
 };
+
+processListItem("tostas","fridgynote3");
 
 module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewListNote }
 
