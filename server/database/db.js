@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 function connect() {
     const connectionString = fs.readFileSync('./database/config.txt').toString();
     console.log(connectionString)
-    mongoose.connect(connectionString)
+    mongoose.connect(connectionString,{dbName:'fridgynote'})
         .then(() => {
             console.log('Database Connected')
         })
