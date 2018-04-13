@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FridgyNote.iml" filepath="$PROJECT_DIR$/FridgyNote.iml" />
+      <module fileurl="file://C:\Users\Lago\git\fridgynote\mobile\FridgyNote\FridgyNote.iml" filepath="C:\Users\Lago\git\fridgynote\mobile\FridgyNote\FridgyNote.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\Lago\git\fridgynote\mobile\FridgyNote\app\app.iml" filepath="C:\Users\Lago\git\fridgynote\mobile\FridgyNote\app\app.iml" />
     </modules>
   </component>
 </project>

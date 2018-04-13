@@ -1,16 +1,36 @@
 package com.bitsplease.fridgynote;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.bitsplease.fridgynote.utils.Mime;
+import com.bitsplease.fridgynote.utils.NfcWrapper;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity {
+    public static final String TAG = "FN-LoginActivity";
+
+    private NfcWrapper mNfcWrapper;
 
     SharedPreferences sharedPreferences;
 
@@ -61,7 +81,39 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        try {
+            mNfcWrapper = new NfcWrapper(this);
+            String res = mNfcWrapper.handleIntent(getIntent());
+            Log.d(TAG, "init " + res);
+        } catch (NfcWrapper.NfcWrapperException e) {
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        if (mNfcWrapper != null) {
+            mNfcWrapper.setupForegroundDispatch();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (mNfcWrapper != null) {
+            mNfcWrapper.stopForegroundDispatch();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (mNfcWrapper != null) {
+            String res = mNfcWrapper.handleIntent(intent);
+            Log.d(TAG, "handle " + res);
+        }
+    }
 }
