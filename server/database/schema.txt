@@ -1,0 +1,58 @@
+Nota de texto [GUARDADO NO SERVIDOR]
+{
+    id: "",
+    title: "",
+    body: "",
+    images: [
+        {
+            path: ""
+        }
+    ],
+    owner: {
+        userId: "test@gmail.com",
+        tagId: "1231-12312-12312"
+    }
+    shared: [
+        {
+            userId: "",
+            tagId: "",
+        }
+    ],
+    labels: []
+}
+
+Lista de compras [GUARDADO NO SERVIDOR]
+{
+    id: "",
+    title: "",
+    items: [
+        "item1",
+        "item2"
+    ],
+    owner: {
+        userId: "test@gmail.com",
+        tagId: "1231-12312-12312"
+    }
+    shared: [
+        {
+            userId: "",
+            tagId: "",
+        }
+    ]
+}
+
+Lembrete [GUARDADO LOCAL]
+{
+    tagId: "",
+    body: ""
+}
+
+Item de compra [GUARDADO NO SERVIDOR]
+{
+    id: "",
+    body: "",
+    listaId: "",
+    owner:  "test@gmail.com",
+    shared: [userId: ""],
+    tagId: "1231-12312-12312"
+}
