@@ -1,37 +1,52 @@
 package com.bitsplease.fridgynote;
 
+
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.bitsplease.fridgynote.fragments.NoteGroupFragment;
+import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;
+import com.bitsplease.fridgynote.fragments.MemoFragment;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
     private static final String TAG = "FN-MainActivity";
 
     private NfcWrapper mNfcWrapper;
-    private TextView mTextMessage;
+
+    private FragmentManager fragmentManager;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+
+                    NoteGroupFragment notesFragment = new NoteGroupFragment();
+                    fragmentTransaction.replace(android.R.id.content,  notesFragment);
+                    fragmentTransaction.commit();
                     return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    ShoppingItemsFragment shoppingFragment = new ShoppingItemsFragment();
+                    fragmentTransaction.replace(android.R.id.content,  shoppingFragment);
+                    fragmentTransaction.commit();
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                    MemoFragment memoFragment = new MemoFragment();
+                    fragmentTransaction.replace(android.R.id.content,  memoFragment);
+                    fragmentTransaction.commit();
                     return true;
             }
             return false;
@@ -41,7 +56,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+
+        fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        NoteGroupFragment notesFragment = new NoteGroupFragment();
+        fragmentTransaction.replace(android.R.id.content,  notesFragment);
+
+        fragmentTransaction.commit();
 
         String readTagContent = null;
         try {
@@ -54,8 +77,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        setContentView(R.layout.activity_main);
+
+        //mTextMessage = (TextView) findViewById(R.id.message);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
