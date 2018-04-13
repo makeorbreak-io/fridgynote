@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:background="#7bae16"
     android:orientation="vertical"
-    android:layout_marginBottom="?attr/actionBarSize"/>
+    android:layout_marginBottom="?attr/actionBarSize">
+
+    <ListView
+        android:id="@+id/notes_groups"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+</FrameLayout>
 
 

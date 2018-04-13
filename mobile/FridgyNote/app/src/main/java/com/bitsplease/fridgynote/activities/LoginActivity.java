@@ -1,4 +1,4 @@
-package com.bitsplease.fridgynote;
+package com.bitsplease.fridgynote.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Constants;
-import com.bitsplease.fridgynote.utils.Mime;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 
 public class LoginActivity extends AppCompatActivity {
@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                //TODO cenas de login genericas
+
 
                 //Field checks
                 EditText email = findViewById(R.id.loginUser);
