@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const db = require('./database/db');
 
-var indexRouter = require('./routes/index');
+var notesRouter = require('./routes/notes');
 
 var app = express();
 
@@ -14,8 +14,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 db.connect();
-db.populate();
+//db.populate();
 
-app.use('/', indexRouter);
+app.use('/notes', notesRouter);
 
 module.exports = app;

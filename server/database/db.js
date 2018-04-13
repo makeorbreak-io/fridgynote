@@ -111,10 +111,18 @@ function populate() {
 
     })
 
-
-
-
 }
 
-module.exports = { connect, populate }
+function createNewListItem(body,listId,owner,shared,tagId){
+    const item = new ListItem({
+        body:body,
+        listId:listId,
+        owner:owner,
+        tagId:tagId,
+        shared:shared
+    })
+    return item.save()
+}
+
+module.exports = { connect, populate,createNewListItem }
 
