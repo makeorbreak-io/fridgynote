@@ -17,6 +17,11 @@ const userTagSchema = new Schema({
     tagId: String
 }, { _id: false })
 
+const listNoteItemSchema = new Schema({
+    checked: Boolean,
+    body: String
+}, { _id: false })
+
 const textNoteSchema = new Schema({
     title: String,
     body: String,
@@ -28,7 +33,7 @@ const textNoteSchema = new Schema({
 
 const listNoteSchema = new Schema({
     title: String,
-    items: [String],
+    items: [listNoteItemSchema],
     owner: userTagSchema,
     shared: [userTagSchema]
 }, { versionKey: false })
@@ -78,7 +83,7 @@ function populate() {
 
     ListNote.create({
         title: "Shopping List",
-        items: ["Cereals", "Carrots", "Gasoline"],
+        items: [{ checked: true, body: "Cereals" }, { checked: true, body: "Carrots" }, { checked: true, body: "Gasoline" }],
         owner: {
             userId: "ines",
             tagId: "fridgynote2"
@@ -125,6 +130,17 @@ function createNewListItem(body, listId, owner, shared, tagId) {
 }
 
 
+function createNewListNote(title, items, ownerId, tagId, shared) {
+    const note = new ListNote({
+        title: title,
+        items: items,
+        owner: { userId: ownerId, tagId: tagId },
+        shared: shared
+    })
+    return note.save()
+}
+
+
 function getNoteByUser(userId) {
 
     var promise1 = TextNote.find({ $or: [{ 'owner.userId': userId }, { shared: { $elemMatch: { userId: userId } } }] });
@@ -136,7 +152,7 @@ function getNoteByUser(userId) {
     return Promise.all([promise1, promise2, promise3]).then(function (values) {
         const joined = {
             'textNote': values[0],
-            'listNote': values[1], 
+            'listNote': values[1],
             'listItem': values[2],
         }
 
@@ -144,5 +160,5 @@ function getNoteByUser(userId) {
     });
 };
 
-module.exports = { connect, populate, createNewListItem, getNoteByUser }
+module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewListNote }
 
