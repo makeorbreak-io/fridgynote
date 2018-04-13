@@ -15,7 +15,7 @@ function connect() {
 const userTagSchema = new Schema({
     userId: String,
     tagId: String
-}, { _id: false })
+}, { _id: false})
 
 const textNoteSchema = new Schema({
     title: String,
@@ -24,14 +24,14 @@ const textNoteSchema = new Schema({
     owner: userTagSchema,
     shared: [userTagSchema],
     labels: []
-})
+}, { versionKey: false })
 
 const listNoteSchema = new Schema({
     title: String,
     items: [String],
     owner: userTagSchema,
     shared: [userTagSchema]
-})
+}, { versionKey: false })
 
 const listItemSchema = new Schema({
     body: String,
@@ -39,7 +39,7 @@ const listItemSchema = new Schema({
     owner: String,
     shared: [String],
     tagId: String
-})
+}, { versionKey: false })
 
 const TextNote = mongoose.model('text_note', textNoteSchema);
 const ListNote = mongoose.model('list_note', listNoteSchema);
@@ -113,8 +113,28 @@ function populate() {
 
 
 
-
 }
+
+function getNoteByUser(userId){
+
+    var promise1 = TextNote.find( { $or: [ { 'owner.userId': userId }, { shared: {$elemMatch: {userId: userId }}}]});
+
+    var promise2 = ListNote.find({ $or: [ {'owner.userId': userId }, { shared: {$elemMatch: {userId: userId }}}]});
+
+    var promise3 = ListItem.find({ $or: [ { owner : userId}, { shared : userId}]});
+
+    Promise.all([promise1, promise2, promise3]).then(function(values) {
+
+        const textNote = {'key': 'textNote', 'values': JSON.stringify(values[0])};
+        const listNote = {'key': 'listNote', 'values': JSON.stringify(values[1])};
+        const listItem = {'key': 'listItem', 'values': JSON.stringify(values[2])};
+        
+        return [textNote, listNote, listItem];
+      });
+};
+
+getNoteByUser('moura');
+
 
 module.exports = { connect, populate }
 
