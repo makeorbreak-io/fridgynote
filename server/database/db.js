@@ -139,8 +139,21 @@ function createNewListNote(title, items, ownerId, tagId, shared) {
     return note.save()
 }
 
-function editListNote(listNoteId,title,items,shared){
-    
+function editListNote(listNoteId, title, items, shared) {
+
+}
+
+function deleteListNote(id) {
+    return ListNote.deleteOne({ _id: id })
+        .then(() => ListItem.deleteMany({ listId: id }))
+}
+
+function deleteTextNote(id) {
+    return TextNote.deleteOne({ _id: id })
+}
+
+function deleteListItem(ownerId, tagId) {
+    return ListItem.deleteMany({ owner: ownerId, tagId: tagId })
 }
 
 function processListItem(ownerId, tagId) {
@@ -182,5 +195,15 @@ function getNoteByUser(userId) {
 };
 
 
-module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewListNote }
+module.exports = {
+    connect,
+    populate,
+    createNewListItem,
+    getNoteByUser,
+    createNewListNote,
+    deleteTextNote,
+    deleteListItem,
+    deleteListNote,
+    processListItem
+}
 

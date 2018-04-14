@@ -41,8 +41,8 @@ router.post('/processItem', [check('tagId').exists(), check('Authorization').exi
     }
 
     db.processListItem()
-    .then(result => res.json(result))
-    .catch((err) => res.status(400).end())
+        .then(result => res.json(result))
+        .catch((err) => res.status(400).end())
 
 });
 
@@ -65,5 +65,57 @@ router.post('/list', [check('title').exists(), check('tagId').exists(), check('A
 router.post('/text', function (req, res, next) {
     res.send('index');
 });
+
+router.delete('/item/:tagId', [check('Authorization').exists()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.deleteListItem(req.get('Authorization'), req.params.tagId)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end();
+        })
+});
+
+router.delete('/list/:id', [check('Authorization').exists()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.deleteListNote(req.params.id)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end();
+        })
+});
+
+router.delete('/text/:id', [check('Authorization').exists()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.deleteTextNote(req.params.id)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end();
+        })
+});
+
 
 module.exports = router;
