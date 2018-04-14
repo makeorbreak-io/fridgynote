@@ -2,6 +2,7 @@ package com.bitsplease.fridgynote.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,25 +19,23 @@ import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
 import com.bitsplease.fridgynote.utils.Constants;
-import com.bitsplease.fridgynote.utils.DialogHelper;
-import com.bitsplease.fridgynote.utils.ImageLoader;
-import com.bitsplease.fridgynote.utils.SizeUtils;
 
 import java.util.List;
 
-public class ListNoteActivity extends AppCompatActivity {
+public class EditListNoteActivity extends AppCompatActivity {
 
     private View mContainer;
-    private TextView mTitleText;
+    private EditText mTitleText;
     private LinearLayout mItemsLayout;
     private View mAddItem;
+    private FloatingActionButton mSubmitButton;
 
     private ListNote mNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_note);
+        setContentView(R.layout.activity_edit_list_note);
 
         Bundle b = getIntent().getExtras();
         String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
@@ -48,9 +46,10 @@ public class ListNoteActivity extends AppCompatActivity {
 
     private void setupUi() {
         mContainer = findViewById(R.id.list_note_container);
-        mTitleText = findViewById(R.id.note_title_text);
+        mTitleText = findViewById(R.id.note_title);
         mItemsLayout = findViewById(R.id.list_note_items_layout);
         mAddItem = findViewById(R.id.add_item);
+        mSubmitButton = findViewById(R.id.save_note);
 
         mTitleText.setText(mNote.getName());
         List<ListNoteItem> items = mNote.getItems();
@@ -61,10 +60,10 @@ public class ListNoteActivity extends AppCompatActivity {
         mAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ListNoteActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditListNoteActivity.this);
                 builder.setTitle("Add Item");
 
-                final EditText input = new EditText(ListNoteActivity.this);
+                final EditText input = new EditText(EditListNoteActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
 
@@ -83,6 +82,13 @@ public class ListNoteActivity extends AppCompatActivity {
                 });
 
                 builder.show();
+            }
+        });
+
+        mSubmitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                submit();
             }
         });
     }
@@ -116,5 +122,9 @@ public class ListNoteActivity extends AppCompatActivity {
         Snackbar mySnackbar = Snackbar.make(mContainer, "Item added to shopping list",
                 Snackbar.LENGTH_SHORT);
         mySnackbar.show();
+    }
+
+    private void submit() {
+        //TODO save note to backend
     }
 }
