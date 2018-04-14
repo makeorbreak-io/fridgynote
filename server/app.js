@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 db.connect();
-db.populate();
+//db.populate();
 
 app.use('/notes', notesRouter);
 

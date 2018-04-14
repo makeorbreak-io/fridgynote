@@ -61,14 +61,36 @@ router.post('/text', [check('title').exists(), check('body').exists(), check('Au
         return res.status(422).json({ errors: errors.mapped() });
       }*/
 
-    db.createNewTextNote(req.body.title, req.body.body, req.files.map(a => a.path), req.get('Authorization'), req.body.shared, req.body.labels).then((listItem) => {
-            console.log(listItem)
-            res.json(listItem)
+    db.createNewTextNote(req.body.title, req.body.body, req.files.map(a => a.path), req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
+            console.log(textNote)
+            res.json(textNote)
         })
         .catch((err) => {
             console.log(err)
             res.status(400).end()
         });
+});
+
+router.put('/text/:textId', [check('listId').exists(), check('title').exists(), check('body').exists(), check('Authorization').exists(), check('labels').exists(),  check('images').exists(), upload.array('images')], function (req, res, next) {
+   
+   /* const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+      }*/
+
+      console.log(req.body)
+
+    db.updateTextNote(req.params.textId, req.body.title, req.body.body, req.body.images,  req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
+            console.log(textNote)
+            res.json(textNote)
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end()
+        });
+
+      
 });
 
 module.exports = router;
