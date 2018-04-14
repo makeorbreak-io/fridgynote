@@ -2,6 +2,7 @@ package com.bitsplease.fridgynote.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -21,6 +23,8 @@ import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
+import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.ImageLoader;
@@ -31,14 +35,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ListNoteActivity extends AppCompatActivity {
+public class ListNoteActivity extends AppCompatActivity implements BackEndCallback {
 
     private View mContainer;
     private TextView mTitleText;
     private LinearLayout mItemsLayout;
     private View mAddItem;
+    private Button mShareButton;
 
     private ListNote mNote;
+    private String mNoteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +52,9 @@ public class ListNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_note);
 
         Bundle b = getIntent().getExtras();
-        String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getListNote(noteId);
+        mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
 
-        setupUi();
+        BackendConnector.getNoteTags(this, this);
     }
 
     @Override
@@ -64,7 +69,8 @@ public class ListNoteActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
-                //TODO re-sync activity;
+                mNote = BackendConnector.getListNote(mNoteId);
+                setupUi();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -76,7 +82,11 @@ public class ListNoteActivity extends AppCompatActivity {
         mTitleText = findViewById(R.id.note_title_text);
         mItemsLayout = findViewById(R.id.list_note_items_layout);
         mAddItem = findViewById(R.id.add_item);
+        mShareButton = findViewById(R.id.share_button);
 
+        while (mItemsLayout.getChildCount() > 1) {
+            mItemsLayout.removeViewAt(0);
+        }
         mTitleText.setText(mNote.getName());
         List<ListNoteItem> items = mNote.getItems();
         for (int i = 0; i < items.size(); ++i) {
@@ -121,6 +131,35 @@ public class ListNoteActivity extends AppCompatActivity {
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
             v.setText("" + keys.get(i).toUpperCase().charAt(0));
         }
+
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListNoteActivity.this);
+                builder.setTitle("Share note with user");
+
+                final EditText input = new EditText(ListNoteActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("User name");
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mNote.getSharedUsers().put(String.valueOf(input.getText()), "");
+                        BackendConnector.updateListNote(ListNoteActivity.this, mNote);
+                        setupUi();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
     }
 
     private int getUserSharedId(int index) {
@@ -184,5 +223,20 @@ public class ListNoteActivity extends AppCompatActivity {
         Snackbar mySnackbar = Snackbar.make(mContainer, "Item added to shopping list",
                 Snackbar.LENGTH_SHORT);
         mySnackbar.show();
+    }
+
+    @Override
+    public void tagNotesCallback(List<Note> response) {
+        for(Note n : response) {
+            if(!(n instanceof ListNote)) {
+                continue;
+            }
+            ListNote note = (ListNote) n;
+            mNote = note;
+            if(note.getId().equals(mNoteId)) {
+                break;
+            }
+        }
+        setupUi();
     }
 }

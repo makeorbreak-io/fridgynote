@@ -10,12 +10,15 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -25,9 +28,13 @@ import android.widget.Toast;
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.LabelViewItem;
+import com.bitsplease.fridgynote.controller.ListNote;
+import com.bitsplease.fridgynote.controller.Note;
 import com.bitsplease.fridgynote.controller.TextNote;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.ImageLoader;
+import com.bitsplease.fridgynote.utils.ImageUploadCallback;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
 import com.bitsplease.fridgynote.utils.SizeUtils;
 
@@ -38,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TextNoteActivity extends AppCompatActivity {
+public class TextNoteActivity extends AppCompatActivity implements ImageUploadCallback, BackEndCallback {
     private static final String TAG = "FN-TextNoteAct";
     public static final int GET_FROM_GALLERY = 3;
     public static final int REQUEST_IMAGE_CAPTURE = 1000;
@@ -48,8 +55,10 @@ public class TextNoteActivity extends AppCompatActivity {
     private LinearLayout mImagesLayout;
     private ImageView mAddImageButton;
     private Spinner mLabelSpinner;
+    private Button mShareButton;
 
     private TextNote mNote;
+    private String mNoteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +66,8 @@ public class TextNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_text_note);
 
         Bundle b = getIntent().getExtras();
-        String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getTextNote(noteId);
-
-        setupUi();
+        mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        BackendConnector.getNoteTags(this, this);
     }
 
     @Override
@@ -75,7 +82,8 @@ public class TextNoteActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
-                //TODO re-sync activity;
+                mNote = BackendConnector.getTextNote(mNoteId);
+                setupUi();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -87,10 +95,15 @@ public class TextNoteActivity extends AppCompatActivity {
         mBodyText = findViewById(R.id.note_body_text);
         mImagesLayout = findViewById(R.id.note_images_layout);
         mAddImageButton = findViewById(R.id.add_image_view);
+        mShareButton = findViewById(R.id.share_button);
         //mLabelSpinner = findViewById(R.id.label_spinner);
 
         mTitleText.setText(mNote.getTitle());
         mBodyText.setText(mNote.getBody());
+
+        while (mImagesLayout.getChildCount() > 1) {
+            mImagesLayout.removeViewAt(0);
+        }
 
         List<String> images = mNote.getImages();
         for (int i = 0; i < images.size(); ++i) {
@@ -120,6 +133,35 @@ public class TextNoteActivity extends AppCompatActivity {
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
             v.setText("" + keys.get(i).toUpperCase().charAt(0));
         }
+
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TextNoteActivity.this);
+                builder.setTitle("Share note with user");
+
+                final EditText input = new EditText(TextNoteActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("User name");
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mNote.getSharedUsers().put(String.valueOf(input.getText()), "");
+                        BackendConnector.uploadTextNote(TextNoteActivity.this, mNote);
+                        setupUi();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
 
         //mLabelSpinner.setAdapter(new ArrayAdapter<LabelViewItem>());
     }
@@ -184,7 +226,6 @@ public class TextNoteActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
         //Detects request codes
         if (requestCode == GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
@@ -213,8 +254,48 @@ public class TextNoteActivity extends AppCompatActivity {
         }
     }
 
-    private boolean uploadBitmap(Bitmap bitmap) {
+    private boolean uploadBitmap(final Bitmap bitmap) {
+        LinearLayout l = new LinearLayout(this);
+        ImageView v = new ImageView(this);
+        l.addView(v);
+        mImagesLayout.addView(l, mImagesLayout.getChildCount() - 1);
+        int pix = SizeUtils.dpToPx(this, 100);
+        l.setLayoutParams(new LinearLayout.LayoutParams(pix, pix));
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO delete
+            }
+        });
+
+
+        BackendConnector.uploadBitmap(this, bitmap, this);
+        //BackendConnector.uploadTextNote(this, mNote);
         // TODO actually upload
+        // multipart form data
+        // post /notes/text
         return false;
+    }
+
+    @Override
+    public void newImageId(String id) {
+        mNote.getImages().add(id);
+        BackendConnector.uploadTextNote(this, mNote);
+    }
+
+    @Override
+    public void tagNotesCallback(List<Note> response) {
+        for(Note n : response) {
+            if(!(n instanceof TextNote)) {
+                continue;
+            }
+            TextNote note = (TextNote) n;
+            mNote = note;
+            if(note.getId().equals(mNoteId)) {
+                break;
+            }
+        }
+        setupUi();
     }
 }
