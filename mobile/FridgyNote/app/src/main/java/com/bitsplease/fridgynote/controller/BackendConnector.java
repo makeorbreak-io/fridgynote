@@ -81,6 +81,11 @@ public class BackendConnector {
         return new ListNote(noteId, "Comprinhas", items);
     }
 
+    public static List<Note> getNotes() {
+        // TODO tostas
+        return new ArrayList<>();
+    }
+
     public static List<NoteTag> getNoteTags() {
         List<NoteTag> res = new ArrayList<>();
         res.add(new NoteTag("fridgynote1", "room"));
