@@ -140,7 +140,14 @@ function createNewListNote(title, items, ownerId, tagId, shared) {
 }
 
 function editListNote(listNoteId, title, items, shared) {
-
+    console.log(listNoteId,title)
+    return ListNote.findById({ _id: listNoteId })
+        .then((listNote) => {
+            if (title) listNote.title = title;
+            if (items) listNote.items = items;
+            if (shared) listNote.shared = shared;
+            return listNote.save();
+        })
 }
 
 function deleteListNote(id) {
@@ -204,6 +211,7 @@ module.exports = {
     deleteTextNote,
     deleteListItem,
     deleteListNote,
-    processListItem
+    processListItem,
+    editListNote
 }
 

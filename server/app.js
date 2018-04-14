@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 db.connect();
-db.populate();
+//db.populate();
 
 app.use('/notes', notesRouter);
 

@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/db')
-const { check, validationResult } = require('express-validator/check');
+const { check, validationResult,oneOf } = require('express-validator/check');
 
 router.get('/me', check('Authorization').exists(), function (req, res) {
     const errors = validationResult(req);
@@ -66,6 +66,23 @@ router.post('/text', function (req, res, next) {
     res.send('index');
 });
 
+router.put('/list/:id', [check('Authorization').exists(),oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.editListNote(req.params.id, req.body.title, req.body.items, req.body.shared)
+        .then((listNote) => {
+            res.json(listNote)
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end()
+        })
+});
+
 router.delete('/item/:tagId', [check('Authorization').exists()], function (req, res) {
     const errors = validationResult(req);
 
@@ -119,3 +136,6 @@ router.delete('/text/:id', [check('Authorization').exists()], function (req, res
 
 
 module.exports = router;
+
+
+// oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])
