@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">FridgyNote</string>
+    <string name="user">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="tag_id">Tag ID:</string>
+    <string name="defaulttagidtext">tag_id</string>
+    <string name="title">Title:</string>
+    <string name="tag_title">Tag Title</string>
+    <string name="type">Type:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="tag_types">
+        <item>Notes</item>
+        <item>Shopping Item</item>
+        <item>Reminder</item>
+    </string-array>
+</resources>
