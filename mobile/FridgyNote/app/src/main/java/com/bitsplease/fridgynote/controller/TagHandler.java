@@ -13,13 +13,13 @@ import com.bitsplease.fridgynote.utils.Constants;
 
 public class TagHandler {
 
-    public static boolean handleTag(Context context, SharedPreferences prefs, String tagId) {
+    public static boolean handleTag(Context context, String tagId) {
         if (tagId == null || tagId.isEmpty()) {
             return false;
         }
 
-        if (BackendConnector.isTagKnown(context, prefs, tagId)) {
-            Reminders r = Reminders.getReminders(prefs);
+        if (BackendConnector.isTagKnown(context, tagId)) {
+            Reminders r = Reminders.getReminders();
             if(r.hasReminder(tagId)) {
                 Reminders.setReminder(context, r.getReminder(tagId));
                 return true;

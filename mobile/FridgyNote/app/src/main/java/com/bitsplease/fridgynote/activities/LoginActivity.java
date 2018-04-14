@@ -3,6 +3,7 @@ package com.bitsplease.fridgynote.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "FN-LoginActivity";
@@ -30,17 +32,21 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //SharedPreferences prefs = getApplicationContext().getSharedPreferences("fridgynote-prefs", Context.MODE_PRIVATE);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceUtils.setPreferences(prefs);
+
         try {
             mNfcWrapper = new NfcWrapper(this);
             String readTag = mNfcWrapper.handleIntent(getIntent());
             Log.d(TAG, "Activity start read => " + readTag);
             // this call may end the activity
-            if(readTag != null && !BackendConnector.isTagKnown(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag)) {
+            if(readTag != null && !BackendConnector.isTagKnown(getApplicationContext(), readTag)) {
                 TagHandler.launchNewTagActivity(this, readTag);
                 finish();
                 return;
             } else {
-                if(TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag)) {
+                if(TagHandler.handleTag(getApplicationContext(), readTag)) {
                     finish();
                     return;
                 }
@@ -51,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
-        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceUtils.getPrefs();
         if (!sharedPreferences.getString(Constants.KEY_USERNAME, "").equals("")) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
@@ -116,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mNfcWrapper != null) {
             String res = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + res);
-            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), res);
+            TagHandler.handleTag(getApplicationContext(), res);
         }
     }
 }

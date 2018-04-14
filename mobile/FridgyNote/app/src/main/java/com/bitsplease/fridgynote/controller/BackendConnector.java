@@ -21,8 +21,8 @@ import java.util.Map;
 
 public class BackendConnector {
 
-    public static boolean isTagKnown(Context context, SharedPreferences prefs, String tagId) {
-        Reminders r = Reminders.getReminders(prefs);
+    public static boolean isTagKnown(Context context, String tagId) {
+        Reminders r = Reminders.getReminders();
         if (r.hasReminder(tagId)) {
             return true;
         }
@@ -101,8 +101,8 @@ public class BackendConnector {
         return res;
     }
 
-    public static Reminders getReminders(SharedPreferences preferences) {
-        return Reminders.getReminders(preferences);
+    public static Reminders getReminders() {
+        return Reminders.getReminders();
     }
 
     public static List<Note> getUnassignedNodes() {
@@ -114,14 +114,11 @@ public class BackendConnector {
         return false;
     }
 
-    public static boolean createReminderTag(SharedPreferences prefs, String tagId, String name) {
-        Reminders r = Reminders.getReminders(prefs);
-        Log.d("FN-", "here1");
+    public static boolean createReminderTag(String tagId, String name) {
+        Reminders r = Reminders.getReminders();
         if (r.hasReminder(tagId)) {
-            Log.d("FN-", "here2");
             return false;
         }
-        Log.d("FN-", "here3");
         r.addReminder(tagId, name);
         return true;
     }
