@@ -35,8 +35,11 @@ public class TagHandler {
                     Toast.makeText(context, "Unable to add shopping item.", Toast.LENGTH_SHORT).show();
                     return false;
                 }
-                return note.addItem(noteName.first);
+                note.addItem(noteName.first);
+                BackendConnector.updateListNote(context, note);
+                return true;
             }
+            
             // TODO get tag type and launch activity/trigger
         } else {
             launchNewTagActivity(context, tagId);

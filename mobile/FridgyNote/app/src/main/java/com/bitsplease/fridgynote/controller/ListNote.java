@@ -76,13 +76,15 @@ public class ListNote extends Note {
     }
 
     public boolean addItem(String item) {
+        boolean found = false;
         for(ListNoteItem i : mItems) {
             if(i.getText().equals(item)) {
-                return false;
+                i.setIsChecked(false);
+                found = true;
             }
         }
-        if(!mItems.add(new ListNoteItem(item, false))) {
-            return false;
+        if(!found) {
+            mItems.add(new ListNoteItem(item, false));
         }
         // TODO update backend
         return true;
