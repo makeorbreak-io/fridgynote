@@ -2,10 +2,10 @@ package com.bitsplease.fridgynote.utils;
 
 import android.content.SharedPreferences;
 
-/**
- * Created by André on 14/04/2018.
- */
+import com.bitsplease.fridgynote.controller.Note;
+
+import java.util.List;
 
 public interface BackEndCallback {
-    public void tagNotesCallback(String response);
+    public void tagNotesCallback(List<Note> response);
 }

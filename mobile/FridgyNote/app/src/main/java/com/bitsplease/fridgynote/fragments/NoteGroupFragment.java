@@ -38,7 +38,7 @@ import java.util.Map;
 public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
     List<TextNote> textNotes = new ArrayList<>();
-    List<ListNote>  listNotes = new ArrayList<>();
+    List<ListNote> listNotes = new ArrayList<>();
 
 
     View view;
@@ -57,68 +57,17 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
 
     @Override
-    public void tagNotesCallback(String response) {
-        JSONObject obj;
-        try {
-            obj = new JSONObject(response);
+    public void tagNotesCallback(List<Note> notes) {
+        List<String> notesLocation = new ArrayList<>();
+        notesLocation.add("Tostas tens de corrigir isto");
+        notesLocation.add("Não te esqueças");
 
-            List<String> notesLocation = new ArrayList<>();
-            JSONArray textNotesArray = obj.getJSONArray("textNote");
-            JSONArray listNotesArray = obj.getJSONArray("listNote");
+        String[] values = notesLocation.toArray(new String[0]);
 
-
-            String noteTags = PreferenceUtils.getPrefs().getString(Constants.KEY_OWNED_TAGS, "");
-            Log.e("FN-OWNED" , noteTags);
-            if(noteTags != ""){
-                Map<String, String> ownedTags = parseString(noteTags);
-                Iterator it = ownedTags.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry)it.next();
-                    Log.e("FN-OwnedTags", pair.getKey() + " = " + pair.getValue());
-                    if(!notesLocation.contains(pair.getValue())){
-                        notesLocation.add((String) pair.getValue());
-                    }
-                    it.remove(); // avoids a ConcurrentModificationException
-                }
-            }
-
-
-           // Log.e("FN-jsonarray", textNotesArray.getJSONObject(0).getString("title"));
-           // Log.e("FN-jsonarray1", listNotesArray.getJSONObject(0).getString("title"));
-
-
-
-
-
-
-            int index;
-
-            for(index=0; index< textNotesArray.length(); index++){
-
-                textNotes.add(new TextNote(textNotesArray.getJSONObject(index)));
-                if( !notesLocation.contains(textNotes.get(index).getTitle())){
-                    notesLocation.add(textNotes.get(index).getTitle());
-                }
-            }
-            for(int i= 0; i < listNotesArray.length(); i++){
-                listNotes.add(new ListNote(listNotesArray.getJSONObject(i)));
-                if( !notesLocation.contains(listNotes.get(i).getName())){
-                    notesLocation.add(listNotes.get(i).getName());
-                }
-            }
-
-            String[] values = notesLocation.toArray(new String[0]);
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                    R.layout.note_group_row, R.id.label_note, values);
-            ListView rv = view.findViewById(R.id.notes_groups);
-            rv.setAdapter(adapter);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                R.layout.note_group_row, R.id.label_note, values);
+        ListView rv = view.findViewById(R.id.notes_groups);
+        rv.setAdapter(adapter);
     }
 
     private Map<String, String> parseString(String str) {
