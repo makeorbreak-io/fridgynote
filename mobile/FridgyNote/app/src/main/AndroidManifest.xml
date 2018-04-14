@@ -40,6 +40,7 @@
         <activity android:name=".activities.TextNoteActivity" />
         <activity android:name=".activities.ListNoteActivity" />
         <activity android:name=".activities.TagNotesActivity" />
+        <activity android:name=".activities.EditTextNoteActivity"></activity>
     </application>
 
 </manifest>
