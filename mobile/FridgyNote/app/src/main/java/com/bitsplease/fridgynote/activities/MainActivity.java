@@ -29,6 +29,7 @@ import com.bitsplease.fridgynote.utils.NfcWrapper;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity {
@@ -37,6 +38,7 @@ public class MainActivity extends FragmentActivity {
     private NfcWrapper mNfcWrapper;
 
     private FragmentManager fragmentManager;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -65,6 +67,8 @@ public class MainActivity extends FragmentActivity {
             return false;
         }
     };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
