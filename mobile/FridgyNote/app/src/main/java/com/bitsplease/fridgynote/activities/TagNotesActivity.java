@@ -52,7 +52,7 @@ public class TagNotesActivity extends AppCompatActivity {
         for(int i = 0; i< notes.size();i++){
             int id = getResources().getIdentifier("card" + (i + 1), "id", this.getPackageName());
             CardView cardView= findViewById(id);
-            ((TextView) ((LinearLayout)cardView.getChildAt(0)).getChildAt(0)).setText(notes.get(i).getTitle());
+            ((TextView) ((LinearLayout)cardView.getChildAt(0)).getChildAt(0)).setText(notes.get(i).getName());
             cardView.setVisibility(View.VISIBLE);
             final String noteId = notes.get(i).getId();
             cardView.setOnClickListener(new View.OnClickListener() {
