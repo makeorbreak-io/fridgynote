@@ -17,6 +17,16 @@ public class BackendConnector {
         return new TextNote(noteId, "Notinha", "Cenas cenas cenas", images);
     }
 
+    public static ListNote getListNote(String noteId) {
+        List<ListNoteItem> items = new ArrayList<>();
+        items.add(new ListNoteItem("Bananas", false));
+        items.add(new ListNoteItem("Chocapitos", false));
+        items.add(new ListNoteItem("Tags NFC", true));
+        items.add(new ListNoteItem("Memes", false));
+        items.add(new ListNoteItem("BigMac", true));
+        return new ListNote(noteId, "Comprinhas", items);
+    }
+
     public static List<NoteTag> getNoteTags() {
         List<NoteTag> res = new ArrayList<>();
         res.add(new NoteTag("fridgynote1", "room"));
@@ -27,8 +37,8 @@ public class BackendConnector {
 
     public static List<ListNote> getListNotes() {
         List<ListNote> res = new ArrayList<>();
-        res.add(new ListNote("id", "Personal Shopping"));
-        res.add(new ListNote("id", "Family Shopping"));
+        res.add(new ListNote("id", "Personal Shopping", new ArrayList<ListNoteItem>()));
+        res.add(new ListNote("id", "Family Shopping", new ArrayList<ListNoteItem>()));
         return res;
     }
 

@@ -37,7 +37,8 @@
         <activity
             android:name=".activities.NewTagActivity"
             android:label="New Tag" />
-        <activity android:name=".activities.TextNoteActivity"></activity>
+        <activity android:name=".activities.TextNoteActivity" />
+        <activity android:name=".activities.ListNoteActivity"></activity>
     </application>
 
 </manifest>
