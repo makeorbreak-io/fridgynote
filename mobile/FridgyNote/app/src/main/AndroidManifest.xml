@@ -36,6 +36,10 @@
             android:label="@string/title_activity_main"></activity>
         <activity android:name=".activities.NewTagActivity"
             android:label="New Tag"></activity>
+
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" />
+        <activity android:name=".activities.TextNoteActivity"></activity>
     </application>
 
 </manifest>
