@@ -97,6 +97,8 @@ public class OwnedNoteTags {
     }
 
     public boolean hasOwnedTag(String tag) {
+        Log.e("FN-OWNEDS", ownedTags.toString());
+        Log.e("FN-OWNEDS", tag);
         return ownedTags.containsKey(tag);
     }
 

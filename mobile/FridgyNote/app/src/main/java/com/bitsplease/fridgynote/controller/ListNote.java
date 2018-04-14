@@ -1,5 +1,11 @@
 package com.bitsplease.fridgynote.controller;
 
+import android.content.SharedPreferences;
+
+import com.bitsplease.fridgynote.utils.Constants;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +22,49 @@ public class ListNote extends Note {
         super(id);
         mName = name;
         mItems = items;
-    }
+        }
 
-    public ListNote(JSONObject obj) throws JSONException {
-        super(obj);
-        mName = obj.getString("title");
+    public ListNote(JSONObject listNote) throws JSONException {
+        super(listNote);
+        mName = listNote.getString("title");
         //TODO parse do resto
+/*
+        JSONObject obj = listNote.getJSONObject("owner");
+        if(obj.getString("userId").equals(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""))){
+            setTagId(obj.getString("tagId"));
+        }else{
+            JSONArray sharedArray = listNote.getJSONArray("shared");
+        for(int i = 0; i < sharedArray.length();i++){
+            if(sharedArray.getJSONObject(i).getString("userId").equals(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""))) {
+                setTagId(sharedArray.getJSONObject(i).getString("tagId"));
+                }
+            }
+        }
+*/
+
+        SharedPreferences prefs = PreferenceUtils.getPrefs();
+
+        if(getOwner().first.equals(prefs.getString(Constants.KEY_USERNAME, ""))){
+            setTagId(getOwner().second);
+        }else{
+            Map<String, String> shared = getSharedUsers();
+
+            for(int i =0; i < shared.size(); i++){
+                if(shared.containsKey(prefs.getString(Constants.KEY_USERNAME, ""))){
+                    setTagId(shared.get(prefs.getString(Constants.KEY_USERNAME, "")));
+                }
+            }
+        }
+
+        List<ListNoteItem> items = new ArrayList<>();
+
+        JSONArray itemsArray = listNote.getJSONArray("items");
+        for(int i =0; i< itemsArray.length(); i++){
+            JSONObject item = itemsArray.getJSONObject(i);
+            items.add(new ListNoteItem(item.getString("body"), item.getBoolean("checked")));
+        }
+        this.mItems = items;
+
     }
 
     public String getName() {

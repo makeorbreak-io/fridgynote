@@ -1,5 +1,8 @@
 package com.bitsplease.fridgynote.controller;
 
+import android.content.SharedPreferences;
+import android.util.Log;
+
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
@@ -7,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +31,7 @@ public class TextNote extends Note {
         super(textNote);
 
         // TODO trocar este codigo para parsar owner e shareds
+        /*
         JSONObject obj = textNote.getJSONObject("owner");
         if(obj.getString("userId").equals(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""))){
             setTagId(obj.getString("tagId"));
@@ -38,13 +43,41 @@ public class TextNote extends Note {
                 }
             }
         }
+        */
+        SharedPreferences prefs = PreferenceUtils.getPrefs();
+
+        if(getOwner().first.equals(prefs.getString(Constants.KEY_USERNAME, ""))){
+            setTagId(getOwner().second);
+        }else{
+            Map<String, String> shared = getSharedUsers();
+
+            for(int i =0; i < shared.size(); i++){
+                if(shared.containsKey(prefs.getString(Constants.KEY_USERNAME, ""))){
+                    setTagId(shared.get(prefs.getString(Constants.KEY_USERNAME, "")));
+                }
+            }
+        }
+
         //super(textNote.getString("_id"));
         mTitle = textNote.getString("title");
         mBody = textNote.getString("body");
+        mImages = new ArrayList<>();
         JSONArray imagesList = textNote.getJSONArray("images");
-        for(int i = 0; i <imagesList.length(); i++){
-            mImages.add(imagesList.getString(i));
+        if(imagesList.length() > 0){
+            for(int i = 0; i <imagesList.length(); i++){
+                JSONObject image = imagesList.getJSONObject(i);
+                mImages.add(image.getString("path"));
+            }
         }
+
+
+        Log.e("FN- TEXTNOTE" , "title: " + mTitle + " body: " + mBody + " images: " + mImages.toString() + " id: " + getId() + " tagId: " + getTagId() + " mOwner: " + getOwner() + " shared: " + getSharedUsers().toString());
+        /*
+        JSONArray labelsList = textNote.getJSONArray("labels");
+        for(int i = 0; i < labelsList.length(); i++){
+            mLabels.add(labelsList.getString(i));
+        }
+        */
     }
 
     public String getTitle() {
