@@ -35,13 +35,17 @@ public class TagNotesActivity extends AppCompatActivity {
         BackendConnector.getNoteTags(this, new BackEndCallback() {
             @Override
             public void tagNotesCallback(List<Note> response) {
+                List<Note> toRemove = new ArrayList<>();
                 for (Note n:response) {
                     if(!n.getTagId().equals(noteId)){
-                        response.remove(n);
+                        //response.remove(n);
+                        toRemove.add(n);
                     }else if(noteId.equals("unassigned") && n.getTagId() != null){
-                        response.remove(n);
+                        //response.remove(n);
+                        toRemove.add(n);
                     }
                 }
+                response.removeAll(toRemove);
                 createNoteList(response);
             }
         });

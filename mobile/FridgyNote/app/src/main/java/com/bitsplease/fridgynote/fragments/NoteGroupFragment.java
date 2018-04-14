@@ -107,7 +107,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
                 String tagId = idMap.get(tv.getText());
 
                 Intent intent = new Intent(getActivity(), TagNotesActivity.class);
-                intent.putExtra("tagId", tagId);
+                intent.putExtra("tag", tagId);
                 startActivity(intent);
 
             }
