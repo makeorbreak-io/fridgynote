@@ -3,6 +3,7 @@ package com.bitsplease.fridgynote.controller;
 import android.util.Log;
 import android.util.Pair;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +29,17 @@ public abstract class Note {
 
     public Note(JSONObject obj) throws JSONException {
        mId = obj.getString("_id");
+       mShared = new HashMap<>();
        // TODO parse owner e shared
+
+        JSONObject owner = obj.getJSONObject("owner");
+        mOwner = new Pair<>(owner.getString("userId"), owner.getString("tagId"));
+
+        JSONArray shared = obj.getJSONArray("shared");
+        for (int i =0; i< shared.length(); i++){
+            JSONObject user = shared.getJSONObject(i);
+            mShared.put(user.getString("userId"), user.getString("tagId"));
+        }
     }
 
     public final String getId() {

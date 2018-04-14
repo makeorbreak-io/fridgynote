@@ -67,7 +67,7 @@ public class BackendConnector {
         }) {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap();
-                headers.put("Authorization", "moura");
+                headers.put("Authorization", PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""));
                 return headers;
             }
         };
@@ -169,8 +169,12 @@ public class BackendConnector {
     }
 
     public static boolean createNoteTag(String tagId, String name) {
-        // TODO codar
-        return false;
+        OwnedNoteTags noteTag = OwnedNoteTags.getOwnedTags();
+        if (noteTag.hasOwnedTag(tagId)) {
+            return false;
+        }
+        noteTag.addOwnedTag(tagId, name);
+        return true;
     }
 
     public static boolean createReminderTag(String tagId, String name) {
@@ -204,6 +208,8 @@ public class BackendConnector {
             for (int i = 0; i < listNotesArray.length(); i++) {
                 result.add(new ListNote(listNotesArray.getJSONObject(i)));
             }
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

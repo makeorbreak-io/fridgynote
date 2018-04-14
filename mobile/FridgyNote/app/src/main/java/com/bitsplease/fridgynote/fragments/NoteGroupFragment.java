@@ -59,8 +59,28 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
     @Override
     public void tagNotesCallback(List<Note> notes) {
         List<String> notesLocation = new ArrayList<>();
+
+        SharedPreferences prefs = PreferenceUtils.getPrefs();
+        String s = prefs.getString(Constants.KEY_OWNED_TAGS, "");
+        if(!s.equals("")){
+            Map<String, String>  tags  = parseString(s);
+            Iterator iterator = tags.entrySet().iterator();
+            while(iterator.hasNext()){
+                Map.Entry pair = (Map.Entry) iterator.next();
+                notesLocation.add(String.valueOf(pair.getValue()));
+            }
+        }
+
         notesLocation.add("Tostas tens de corrigir isto");
         notesLocation.add("Não te esqueças");
+        if(notes != null){
+            for (Note n : notes){
+                if(n.getTagId() == null || n.getTagId().equals("")){
+                    notesLocation.add("Unassigned");
+                }
+            }
+        }
+
 
         String[] values = notesLocation.toArray(new String[0]);
 
@@ -69,6 +89,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
         ListView rv = view.findViewById(R.id.notes_groups);
         rv.setAdapter(adapter);
     }
+
 
     private Map<String, String> parseString(String str) {
         if (str == null || str.isEmpty()) {
