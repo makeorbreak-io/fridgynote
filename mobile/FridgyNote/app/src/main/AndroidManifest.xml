@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,13 +32,13 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/title_activity_main" />
         <activity
             android:name=".activities.NewTagActivity"
             android:label="New Tag" />
         <activity android:name=".activities.TextNoteActivity" />
-        <activity android:name=".activities.ListNoteActivity"></activity>
+        <activity android:name=".activities.ListNoteActivity" />
     </application>
 
 </manifest>

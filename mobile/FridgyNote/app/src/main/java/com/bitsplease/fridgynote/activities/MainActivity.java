@@ -1,4 +1,4 @@
-package com.bitsplease.fridgynote;
+package com.bitsplease.fridgynote.activities;
 
 
 import android.app.FragmentManager;
@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.bitsplease.fridgynote.controller.Reminders;
+import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.fragments.NoteGroupFragment;
 import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;

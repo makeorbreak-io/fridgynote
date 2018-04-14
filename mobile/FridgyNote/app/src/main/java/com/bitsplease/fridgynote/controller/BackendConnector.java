@@ -3,20 +3,64 @@ package com.bitsplease.fridgynote.controller;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 
-import com.bitsplease.fridgynote.utils.Constants;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BackendConnector {
 
     public static boolean isTagKnown(Context context, SharedPreferences prefs, String tagId) {
         Reminders r = Reminders.getReminders(prefs);
-        if(r.hasReminder(tagId)) {
+        if (r.hasReminder(tagId)) {
             return true;
         }
         return false;
+    }
+
+
+    public static void getNoteTags(Context context, final BackEndCallback callback) {
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(context);
+        String url = "https://fridgynote.herokuapp.com/notes/me";
+        JSONObject resp;
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Log.e("FN- RESPONSE", "Response is: " + response);
+                        callback.tagNotesCallback(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FN-ERROR", "That didn't work!");
+            }
+        }) {
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap();
+                headers.put("Authorization", "moura");
+                return headers;
+            }
+        };
+
+        queue.add(stringRequest);
+
     }
 
     public static TextNote getTextNote(String noteId) {
@@ -68,7 +112,7 @@ public class BackendConnector {
     public static boolean createReminderTag(SharedPreferences prefs, String tagId, String name) {
         Reminders r = Reminders.getReminders(prefs);
         Log.d("FN-", "here1");
-        if(r.hasReminder(tagId)) {
+        if (r.hasReminder(tagId)) {
             Log.d("FN-", "here2");
             return false;
         }
@@ -81,4 +125,6 @@ public class BackendConnector {
         // TODO codar
         return false;
     }
+
+
 }

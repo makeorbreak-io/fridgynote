@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Animation.AppCompat.DropDownUp"
-    tools:context="com.bitsplease.fridgynote.LoginActivity">
+    tools:context="com.bitsplease.fridgynote.activities.LoginActivity">
 
     <ImageView
         android:id="@+id/imageView"
