@@ -115,7 +115,13 @@ public class BackendConnector {
         images.add("https://pbs.twimg.com/profile_images/949374088249671680/MuxDEZpD_400x400.jpg");
         images.add("https://upload.wikimedia.org/wikipedia/commons/0/0f/Eiffel_Tower_Vertical.JPG");
         images.add("https://ironcodestudio.com/wp-content/uploads/2015/03/css-remove-horizontal-scrollbar.jpg");
-        return new TextNote(noteId, "Notinha", "Cenas cenas cenas", images);
+
+        TextNote res = new TextNote(noteId, "Notinha", "Cenas cenas cenas", images);
+        res.setOwner("lago", "tag");
+        Map<String, String> shared = new HashMap<>();
+        shared.put("tostos", "tag2");
+        res.setSharedUsers(shared);
+        return res;
     }
 
     public static ListNote getListNote(String noteId) {
@@ -125,7 +131,13 @@ public class BackendConnector {
         items.add(new ListNoteItem("Tags NFC", true));
         items.add(new ListNoteItem("Memes", false));
         items.add(new ListNoteItem("BigMac", true));
-        return new ListNote(noteId, "Comprinhas", items);
+
+        ListNote res = new ListNote(noteId, "Comprinhas", items);
+        res.setOwner("lago", "tag");
+        Map<String, String> shared = new HashMap<>();
+        shared.put("tostos", "tag2");
+        res.setSharedUsers(shared);
+        return res;
     }
 
     public static List<Note> getNotes() {

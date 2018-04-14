@@ -6,6 +6,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -21,9 +24,12 @@ import com.bitsplease.fridgynote.controller.ListNoteItem;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.ImageLoader;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 import com.bitsplease.fridgynote.utils.SizeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ListNoteActivity extends AppCompatActivity {
 
@@ -44,6 +50,25 @@ public class ListNoteActivity extends AppCompatActivity {
         mNote = BackendConnector.getListNote(noteId);
 
         setupUi();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.sync_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_sync:
+                //TODO re-sync activity;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setupUi() {
@@ -85,6 +110,49 @@ public class ListNoteActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+
+        Map<String, String> users = mNote.getAllUsersExcept(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""));
+        List<String> keys = new ArrayList<>(users.keySet());
+        for(int i = 0; i < 5; ++i) {
+            findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.GONE);
+        }
+        for(int i = 0; i < keys.size(); ++i) {
+            TextView v = findViewById(getUserSharedId(i));
+            findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
+            v.setText("" + keys.get(i).toUpperCase().charAt(0));
+        }
+    }
+
+    private int getUserSharedId(int index) {
+        switch (index) {
+            case 0:
+                return R.id.share_user_1;
+            case 1:
+                return R.id.share_user_2;
+            case 2:
+                return R.id.share_user_3;
+            case 3:
+                return R.id.share_user_4;
+            case 4:
+                return R.id.share_user_5;
+        }
+        return 0;
+    }
+
+    private int getViewParent(int viewId) {
+        switch (viewId) {
+            case R.id.share_user_1:
+                return R.id.share_user_1_parent;
+            case R.id.share_user_2:
+                return R.id.share_user_2_parent;
+            case R.id.share_user_3:
+                return R.id.share_user_3_parent;
+            case R.id.share_user_4:
+                return R.id.share_user_4_parent;
+            case R.id.share_user_5:
+                return R.id.share_user_5_parent;
+        }
+        return 0;
     }
 
     private void addListItem(final ListNoteItem item) {
