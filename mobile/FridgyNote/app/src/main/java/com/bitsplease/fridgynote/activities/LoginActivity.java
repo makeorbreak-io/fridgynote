@@ -1,4 +1,4 @@
-package com.bitsplease.fridgynote;
+package com.bitsplease.fridgynote.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +12,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
+import com.bitsplease.fridgynote.R;
+
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Constants;
-import com.bitsplease.fridgynote.utils.Mime;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 
 public class LoginActivity extends AppCompatActivity {
@@ -33,14 +35,15 @@ public class LoginActivity extends AppCompatActivity {
             String readTag = mNfcWrapper.handleIntent(getIntent());
             Log.d(TAG, "Activity start read => " + readTag);
             // this call may end the activity
-            if(readTag != null && !BackendConnector.isTagKnown(readTag)) {
-                Log.d(TAG, "here");
+            if(readTag != null && !BackendConnector.isTagKnown(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag)) {
                 TagHandler.launchNewTagActivity(this, readTag);
                 finish();
                 return;
             } else {
-                Log.d(TAG, "here2");
-                TagHandler.handleTag(this, readTag);
+                if(TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag)) {
+                    finish();
+                    return;
+                }
             }
         } catch (NfcWrapper.NfcWrapperException e) {
             e.printStackTrace();
@@ -49,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-        if(!sharedPreferences.getString(Constants.KEY_USERNAME, "").equals("")){
+        if (!sharedPreferences.getString(Constants.KEY_USERNAME, "").equals("")) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -58,22 +61,22 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         Button clickButton = findViewById(R.id.buttonLogin);
-        clickButton.setOnClickListener( new View.OnClickListener() {
+        clickButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                //TODO cenas de login genericas
+
 
                 //Field checks
                 EditText email = findViewById(R.id.loginUser);
                 EditText pass = findViewById(R.id.loginPass);
 
-                if(TextUtils.isEmpty(email.getText())){
+                if (TextUtils.isEmpty(email.getText())) {
                     email.requestFocus();
                     email.setError("Username field cannot be empty");
                     return;
                 }
-                if(TextUtils.isEmpty(pass.getText())){
+                if (TextUtils.isEmpty(pass.getText())) {
                     pass.requestFocus();
                     pass.setError("Password field cannot be empty");
                     return;
@@ -113,7 +116,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mNfcWrapper != null) {
             String res = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + res);
-            TagHandler.handleTag(this, res);
+            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), res);
         }
     }
 }

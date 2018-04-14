@@ -5,6 +5,7 @@ public class NoteTag extends Tag {
 
     public NoteTag(String id, String name) {
         super(id);
+        mName = name;
     }
 
     public String getName() {

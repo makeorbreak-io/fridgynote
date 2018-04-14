@@ -1,5 +1,6 @@
 package com.bitsplease.fridgynote.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -100,7 +101,7 @@ public class NewTagActivity extends AppCompatActivity {
                         break;
                     case 2:
                         // REMINDER TAG
-                        boolean reminderCreated = BackendConnector.createReminderTag(tagId, tagTitle);
+                        boolean reminderCreated = BackendConnector.createReminderTag(getPreferences(Context.MODE_PRIVATE), tagId, tagTitle);
                         if(reminderCreated) {
                             Toast.makeText(NewTagActivity.this, "Reminder tag created", Toast.LENGTH_SHORT).show();
                             finish();
@@ -167,7 +168,7 @@ public class NewTagActivity extends AppCompatActivity {
         if (mNfcWrapper != null) {
             String res = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + res);
-            if (!BackendConnector.isTagKnown(res)) {
+            if (!BackendConnector.isTagKnown(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), res)) {
                 tagIdText.setText(res);
             }
         }

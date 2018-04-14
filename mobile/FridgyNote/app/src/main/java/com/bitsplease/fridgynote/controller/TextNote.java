@@ -1,5 +1,9 @@
 package com.bitsplease.fridgynote.controller;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 public class TextNote extends Note {
@@ -12,6 +16,16 @@ public class TextNote extends Note {
         mTitle = title;
         mBody = body;
         mImages = images;
+    }
+
+    public TextNote(JSONObject textNote) throws JSONException {
+        super(textNote.getString("_id"));
+        mTitle = textNote.getString("title");
+        mBody = textNote.getString("body");
+        JSONArray imagesList = textNote.getJSONArray("images");
+        for(int i = 0; i <imagesList.length(); i++){
+            mImages.add(imagesList.getString(i));
+        }
     }
 
     public String getTitle() {

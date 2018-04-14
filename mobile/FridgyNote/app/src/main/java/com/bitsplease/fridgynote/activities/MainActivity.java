@@ -1,8 +1,9 @@
-package com.bitsplease.fridgynote;
+package com.bitsplease.fridgynote.activities;
 
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +13,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.bitsplease.fridgynote.controller.Reminders;
+import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.fragments.NoteGroupFragment;
 import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;
@@ -57,7 +60,6 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -71,7 +73,7 @@ public class MainActivity extends FragmentActivity {
             mNfcWrapper = new NfcWrapper(this);
             String readTag = mNfcWrapper.handleIntent(getIntent());
             Log.d(TAG, "Activity start read => " + readTag);
-            TagHandler.handleTag(this, readTag);
+            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag);
         } catch (NfcWrapper.NfcWrapperException e) {
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -106,7 +108,7 @@ public class MainActivity extends FragmentActivity {
         if (mNfcWrapper != null) {
             String readTag = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + readTag);
-            TagHandler.handleTag(this, readTag);
+            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag);
         }
     }
 
