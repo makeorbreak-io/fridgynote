@@ -17,6 +17,11 @@ const userTagSchema = new Schema({
     tagId: String
 }, { _id: false })
 
+const listNoteItemSchema = new Schema({
+    checked: Boolean,
+    body: String
+}, { _id: false })
+
 const textNoteSchema = new Schema({
     title: String,
     body: String,
@@ -28,7 +33,7 @@ const textNoteSchema = new Schema({
 
 const listNoteSchema = new Schema({
     title: String,
-    items: [String],
+    items: [listNoteItemSchema],
     owner: userTagSchema,
     shared: [userTagSchema]
 }, { versionKey: false })
@@ -78,7 +83,7 @@ function populate() {
 
     ListNote.create({
         title: "Shopping List",
-        items: ["Cereals", "Carrots", "Gasoline"],
+        items: [{ checked: true, body: "Cereals" }, { checked: true, body: "Carrots" }, { checked: true, body: "Gasoline" }],
         owner: {
             userId: "ines",
             tagId: "fridgynote2"
@@ -113,15 +118,67 @@ function populate() {
 
 }
 
-function createNewListItem(body, listId, owner, shared, tagId) {
-    const item = new ListItem({
+function createNewListItem(body, listId, owner, shared = [], tagId) {
+    return ListItem.findOneAndUpdate({ owner: owner, tagId: tagId }, {
         body: body,
         listId: listId,
         owner: owner,
         tagId: tagId,
         shared: shared
+    }, { upsert: true })
+}
+
+
+function createNewListNote(title, items, ownerId, tagId, shared) {
+    const note = new ListNote({
+        title: title,
+        items: items,
+        owner: { userId: ownerId, tagId: tagId },
+        shared: shared
     })
-    return item.save()
+    return note.save()
+}
+
+function editListNote(listNoteId, title, items, shared) {
+    console.log(listNoteId,title)
+    return ListNote.findById({ _id: listNoteId })
+        .then((listNote) => {
+            if (title) listNote.title = title;
+            if (items) listNote.items = items;
+            if (shared) listNote.shared = shared;
+            return listNote.save();
+        })
+}
+
+function deleteListNote(id) {
+    return ListNote.deleteOne({ _id: id })
+        .then(() => ListItem.deleteMany({ listId: id }))
+}
+
+function deleteTextNote(id) {
+    return TextNote.deleteOne({ _id: id })
+}
+
+function deleteListItem(ownerId, tagId) {
+    return ListItem.deleteMany({ owner: ownerId, tagId: tagId })
+}
+
+function processListItem(ownerId, tagId) {
+    return ListItem.findOne({ owner: ownerId, tagId: tagId })
+        .then((listItem) => {
+            return ListNote.findById(listItem.listId)
+                .then((listNote) => {
+                    const index = listNote.items.findIndex(function (element, index, array) {
+                        return element.checked == true && element.body == listItem.body;
+                    })
+                    if (index == -1) {
+                        listNote.items.push({ checked: false, body: listItem.body })
+                    } else {
+                        listNote.items[index].checked = false;
+                    }
+                    return listNote.save();
+                })
+        })
 }
 
 function createNewTextNote(title, body, images, owner, shared, labels) {
@@ -146,7 +203,7 @@ function getNoteByUser(userId) {
     return Promise.all([promise1, promise2, promise3]).then(function (values) {
         const joined = {
             'textNote': values[0],
-            'listNote': values[1], 
+            'listNote': values[1],
             'listItem': values[2],
         }
 
@@ -168,5 +225,18 @@ function updateTextNote(id, title, body, images, owner, shared, labels) {
 
 }
 
-module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewTextNote, updateTextNote }
+
+module.exports = {
+    connect,
+    populate,
+    createNewListItem,
+    getNoteByUser,
+    createNewListNote,
+    deleteTextNote,
+    deleteListItem,
+    deleteListNote,
+    processListItem,
+    updateTextNote,
+    editListNote
+}
 

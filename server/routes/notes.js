@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/db')
-const { check,validationResult } = require('express-validator/check');
+const { check, validationResult,oneOf } = require('express-validator/check');
 
 var multer  = require('multer')
 var Storage = multer.diskStorage({
@@ -19,28 +19,26 @@ var upload = multer({
 
 router.get('/me',check('Authorization').exists(),function(req, res){
     const errors = validationResult(req);
-    
+
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
-      }
+    }
 
-      db.getNoteByUser(req.get('Authorization'))
-      .then(result => res.json(result))
-      .catch((err) => res.status(400).end())
+    db.getNoteByUser(req.get('Authorization'))
+        .then(result => res.json(result))
+        .catch((err) => res.status(400).end())
 
 })
 
-
-router.post('/item', [check('body').exists(), check('listId').exists(), check('Authorization').exists(), check('tagId').exists()], upload.array('avatar'),function (req, res, next) {
+router.post('/item', [check('body').exists(), check('listId').exists(), check('Authorization').exists(), check('tagId').exists()], function (req, res, next) {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
-      }
-    
-    db.createNewListItem(req.body.body, req.body.listId, req.get('Authorization'), req.body.shared, req.tagId)
+    }
+
+    db.createNewListItem(req.body.body, req.body.listId, req.get('Authorization'), req.body.shared, req.body.tagId)
         .then((listItem) => {
-            console.log(listItem)
             res.json(listItem)
         })
         .catch((err) => {
@@ -49,8 +47,33 @@ router.post('/item', [check('body').exists(), check('listId').exists(), check('A
         })
 });
 
-router.post('/list', function (req, res, next) {
-    res.send('index');
+router.post('/processItem', [check('tagId').exists(), check('Authorization').exists()], function (req, res, next) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.processListItem()
+        .then(result => res.json(result))
+        .catch((err) => res.status(400).end())
+
+});
+
+router.post('/list', [check('title').exists(), check('tagId').exists(), check('Authorization').exists()], function (req, res, next) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.createNewListNote(req.body.title, req.body.items, req.get('Authorization'), req.body.tagId, req.body.shared)
+        .then((listNote) => {
+            res.json(listNote)
+        })
+        .catch((err) => {
+            res.status(400).end()
+        })
 });
 
 router.post('/text', [check('title').exists(), check('body').exists(), check('Authorization').exists(), check('labels').exists(),  check('images').exists(), upload.array('images')], function (req, res, next) {
@@ -92,4 +115,76 @@ router.put('/text/:textId', [check('Authorization').exists(), oneOf([check('list
       
 });
 
+router.put('/list/:id', [check('Authorization').exists(),oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.editListNote(req.params.id, req.body.title, req.body.items, req.body.shared)
+        .then((listNote) => {
+            res.json(listNote)
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end()
+        })
+});
+
+router.delete('/item/:tagId', [check('Authorization').exists()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.deleteListItem(req.get('Authorization'), req.params.tagId)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end();
+        })
+});
+
+router.delete('/list/:id', [check('Authorization').exists()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.deleteListNote(req.params.id)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end();
+        })
+});
+
+router.delete('/text/:id', [check('Authorization').exists()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.deleteTextNote(req.params.id)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).end();
+        })
+});
+
+
 module.exports = router;
+
+
+// oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])
