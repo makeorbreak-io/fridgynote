@@ -26,6 +26,10 @@ public class BackendConnector {
         if (r.hasReminder(tagId)) {
             return true;
         }
+        ShoppingItems s = ShoppingItems.getShoppingItems();
+        if(s.hasShoppingItem(tagId)) {
+            return true;
+        }
         return false;
     }
 
@@ -124,8 +128,12 @@ public class BackendConnector {
     }
 
     public static boolean createShoppingItemTag(String tagId, String name, ListNote listNote) {
-        // TODO codar
-        return false;
+        ShoppingItems r = ShoppingItems.getShoppingItems();
+        if (r.hasShoppingItem(tagId)) {
+            return false;
+        }
+        r.addShoppingItem(tagId, name, listNote.getId());
+        return true;
     }
 
 

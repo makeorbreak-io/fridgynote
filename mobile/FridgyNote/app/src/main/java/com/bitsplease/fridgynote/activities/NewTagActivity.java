@@ -81,6 +81,7 @@ public class NewTagActivity extends AppCompatActivity {
                 switch (type) {
                     case 0:
                         // NOTE TAG
+
                         boolean noteCreated = BackendConnector.createNoteTag(tagId, tagTitle);
                         if(noteCreated) {
                             Toast.makeText(NewTagActivity.this, "Note tag created", Toast.LENGTH_SHORT).show();
