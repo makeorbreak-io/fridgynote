@@ -28,6 +28,7 @@ import com.bitsplease.fridgynote.controller.LabelViewItem;
 import com.bitsplease.fridgynote.controller.TextNote;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.ImageLoader;
+import com.bitsplease.fridgynote.utils.ImageUploadCallback;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
 import com.bitsplease.fridgynote.utils.SizeUtils;
 
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TextNoteActivity extends AppCompatActivity {
+public class TextNoteActivity extends AppCompatActivity implements ImageUploadCallback {
     private static final String TAG = "FN-TextNoteAct";
     public static final int GET_FROM_GALLERY = 3;
     public static final int REQUEST_IMAGE_CAPTURE = 1000;
@@ -184,7 +185,6 @@ public class TextNoteActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
         //Detects request codes
         if (requestCode == GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
@@ -213,8 +213,33 @@ public class TextNoteActivity extends AppCompatActivity {
         }
     }
 
-    private boolean uploadBitmap(Bitmap bitmap) {
+    private boolean uploadBitmap(final Bitmap bitmap) {
+        LinearLayout l = new LinearLayout(this);
+        ImageView v = new ImageView(this);
+        l.addView(v);
+        mImagesLayout.addView(l, mImagesLayout.getChildCount() - 1);
+        int pix = SizeUtils.dpToPx(this, 100);
+        l.setLayoutParams(new LinearLayout.LayoutParams(pix, pix));
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO delete
+            }
+        });
+
+
+        BackendConnector.uploadBitmap(this, bitmap, this);
+        //BackendConnector.uploadTextNote(this, mNote);
         // TODO actually upload
+        // multipart form data
+        // post /notes/text
         return false;
+    }
+
+    @Override
+    public void newImageId(String id) {
+        mNote.getImages().add(id);
+        BackendConnector.uploadTextNote(this, mNote);
     }
 }
