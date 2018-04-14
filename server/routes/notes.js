@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/db')
-const { check, validationResult,oneOf } = require('express-validator/check');
+const { check, validationResult, oneOf} = require('express-validator/check');
 
 var multer  = require('multer')
 var Storage = multer.diskStorage({
@@ -76,14 +76,14 @@ router.post('/list', [check('title').exists(), check('tagId').exists(), check('A
         })
 });
 
-router.post('/text', [check('title').exists(), check('body').exists(), check('Authorization').exists(), check('labels').exists(),  check('images').exists(), upload.array('images')], function (req, res, next) {
-   
-    /*  const errors = validationResult(req);
+router.post('/text', [check('title').exists(), check('body').exists(), check('Authorization').exists(), check('labels').exists(), upload.array('images')], function (req, res, next) {
+    /*
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
       }*/
-
+     
     db.createNewTextNote(req.body.title, req.body.body, req.files.map(a => a.path), req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
             console.log(textNote)
             res.json(textNote)
@@ -94,7 +94,7 @@ router.post('/text', [check('title').exists(), check('body').exists(), check('Au
         });
 });
 
-router.put('/text/:textId', [check('Authorization').exists(), upload.array('images'), check('title').exists(), check('body').exists(), check('labels').exists(),  check('images').exists()])], function (req, res, next) {
+router.put('/text/:textId', [check('Authorization').exists(), upload.array('images'), oneOf([check('title').exists(), check('body').exists(), check('labels').exists(),  check('images').exists()])], function (req, res, next) {
     const errors = validationResult(req);
 
     console.log(req.body)

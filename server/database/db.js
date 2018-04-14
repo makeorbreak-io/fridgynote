@@ -230,13 +230,14 @@ module.exports = {
     connect,
     populate,
     createNewListItem,
-    getNoteByUser,
+    createNewTextNote,
     createNewListNote,
-    deleteTextNote,
-    deleteListItem,
-    deleteListNote,
+    getNoteByUser,
     processListItem,
     updateTextNote,
-    editListNote
+    editListNote,
+    deleteTextNote,
+    deleteListItem,
+    deleteListNote
 }
 
