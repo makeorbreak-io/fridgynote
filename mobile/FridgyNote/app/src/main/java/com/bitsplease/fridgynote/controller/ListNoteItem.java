@@ -20,4 +20,8 @@ public class ListNoteItem {
     public boolean isChecked() {
         return mChecked;
     }
+
+    public void setIsChecked(boolean checked) {
+        mChecked = checked;
+    }
 }

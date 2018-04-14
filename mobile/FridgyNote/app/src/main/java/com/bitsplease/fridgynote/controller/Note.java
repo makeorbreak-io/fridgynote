@@ -22,6 +22,8 @@ public abstract class Note {
 
     public Note(String id) {
         mId = id;
+        mShared = new HashMap<>();
+        mLabels = new ArrayList<>();
     }
 
     public Note(JSONObject obj) throws JSONException {

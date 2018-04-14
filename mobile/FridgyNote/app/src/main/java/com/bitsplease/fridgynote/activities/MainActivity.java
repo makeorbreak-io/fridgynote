@@ -14,6 +14,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.bitsplease.fridgynote.controller.BackendConnector;
+import com.bitsplease.fridgynote.controller.ListNote;
+import com.bitsplease.fridgynote.controller.ListNoteItem;
 import com.bitsplease.fridgynote.controller.Reminders;
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.TagHandler;
@@ -22,6 +25,9 @@ import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;
 import com.bitsplease.fridgynote.fragments.MemoFragment;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "FN-MainActivity";
