@@ -212,7 +212,7 @@ function getNoteByUser(userId) {
 };
 
 function updateTextNote(id, title, body, images, owner, shared, labels) {
-
+    
     return TextNote.findById({ _id: id })
     .then((textNote) => {
         if (title) textNote.title = title;

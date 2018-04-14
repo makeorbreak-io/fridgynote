@@ -94,16 +94,17 @@ router.post('/text', [check('title').exists(), check('body').exists(), check('Au
         });
 });
 
-router.put('/text/:textId', [check('Authorization').exists(), oneOf([check('listId').exists(), check('title').exists(), check('body').exists(), check('labels').exists(),  check('images').exists()]), upload.array('images')], function (req, res, next) {
-   
+router.put('/text/:textId', [check('Authorization').exists(), upload.array('images'), check('title').exists(), check('body').exists(), check('labels').exists(),  check('images').exists()])], function (req, res, next) {
     const errors = validationResult(req);
+
+    console.log(req.body)
 
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
       }
 
 
-    db.updateTextNote(req.params.textId, req.body.title, req.body.body, req.body.images,  req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
+    db.updateTextNote(req.params.textId, req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
             console.log(textNote)
             res.json(textNote)
         })
