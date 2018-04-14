@@ -156,40 +156,16 @@ function getNoteByUser(userId) {
 
 function updateTextNote(id, title, body, images, owner, shared, labels) {
 
-    console.log(title + ' ' + body +  ' ' + images + ' ' +  owner + ' ' +  shared  + ' ' + labels );
+    return TextNote.findById({ _id: id })
+    .then((textNote) => {
+        if (title) textNote.title = title;
+        if (body) textNote.body = body;
+        if (images) textNote.images = images;
+        if (shared) textNote.shared = shared;
+        if (labels) textNote.labels = labels;
+        return textNote.save();
+    })
 
-   return TextNote.findById(id, function (err, tank) {
-        if (err)  console.log(err);
-
-       /* for(let i= 0; i < argumets; i++){
-            if(arguments[i] !== undefined)
-                tank.set({ 'arguments[i]' : arguments[i] });
-            console.log(tank);
-        }*/
-
-      
-        if(title !== undefined || title !== null)
-            tank.update({ title: title });
-
-        if(body !== undefined || body !== null)
-            tank.update({ body: body });
-        
-        if(images !== undefined || images !== null)
-            tank.update({ images: images });
-       
-        if(shared !== undefined || shared !== null)
-            tank.update({ shared: shared });
-
-        if(labels !== undefined || labels !== null)
-            tank.update({ labels: labels });
-        
-        console.log(tank);
-
-         return tank.save(function (err, updatedTank) {
-            if (err)  return err;
-            return updatedTank;
-            })
-   });
 }
 
 module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewTextNote, updateTextNote }
