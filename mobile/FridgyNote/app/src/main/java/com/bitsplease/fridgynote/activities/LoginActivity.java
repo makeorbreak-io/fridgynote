@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "FN-LoginActivity";
 
     private NfcWrapper mNfcWrapper;
-    SharedPreferences sharedPreferences;
+    public  SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

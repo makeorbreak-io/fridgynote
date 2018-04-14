@@ -1,5 +1,7 @@
 package com.bitsplease.fridgynote.utils;
 
+import android.content.SharedPreferences;
+
 /**
  * Created by André on 14/04/2018.
  */
