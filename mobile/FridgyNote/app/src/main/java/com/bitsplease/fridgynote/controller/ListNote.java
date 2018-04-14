@@ -26,4 +26,17 @@ public class ListNote extends Note {
     public List<ListNoteItem> getItems() {
         return mItems;
     }
+
+    public boolean addItem(String item) {
+        for(ListNoteItem i : mItems) {
+            if(i.getText().equals(item)) {
+                return false;
+            }
+        }
+        if(!mItems.add(new ListNoteItem(item, false))) {
+            return false;
+        }
+        // TODO update backend
+        return true;
+    }
 }

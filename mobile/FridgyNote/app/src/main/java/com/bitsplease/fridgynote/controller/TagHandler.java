@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.bitsplease.fridgynote.activities.ListNoteActivity;
 import com.bitsplease.fridgynote.activities.NewTagActivity;
@@ -23,6 +24,18 @@ public class TagHandler {
             if(r.hasReminder(tagId)) {
                 Reminders.setReminder(context, r.getReminder(tagId));
                 return true;
+            }
+
+            ShoppingItems s = ShoppingItems.getShoppingItems();
+            if(s.hasShoppingItem(tagId)) {
+                String noteName = s.getShoppingItem(tagId);
+                ListNote note = BackendConnector.getListNote(noteName);
+
+                if(note == null) {
+                    Toast.makeText(context, "Unable to add shopping item.", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                return note.addItem()
             }
             // TODO get tag type and launch activity/trigger
         } else {
