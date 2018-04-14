@@ -33,14 +33,15 @@ public class LoginActivity extends AppCompatActivity {
             String readTag = mNfcWrapper.handleIntent(getIntent());
             Log.d(TAG, "Activity start read => " + readTag);
             // this call may end the activity
-            if(readTag != null && !BackendConnector.isTagKnown(readTag)) {
-                Log.d(TAG, "here");
+            if(readTag != null && !BackendConnector.isTagKnown(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag)) {
                 TagHandler.launchNewTagActivity(this, readTag);
                 finish();
                 return;
             } else {
-                Log.d(TAG, "here2");
-                TagHandler.handleTag(this, readTag);
+                if(TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag)) {
+                    finish();
+                    return;
+                }
             }
         } catch (NfcWrapper.NfcWrapperException e) {
             e.printStackTrace();
@@ -113,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mNfcWrapper != null) {
             String res = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + res);
-            TagHandler.handleTag(this, res);
+            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), res);
         }
     }
 }

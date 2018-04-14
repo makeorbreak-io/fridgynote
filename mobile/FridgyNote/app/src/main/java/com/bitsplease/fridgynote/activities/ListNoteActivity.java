@@ -113,7 +113,6 @@ public class ListNoteActivity extends AppCompatActivity {
 
         addListItem(new ListNoteItem(itemName));
         // TODO adicionar item a backend
-
         Snackbar mySnackbar = Snackbar.make(mContainer, "Item added to shopping list",
                 Snackbar.LENGTH_SHORT);
         mySnackbar.show();

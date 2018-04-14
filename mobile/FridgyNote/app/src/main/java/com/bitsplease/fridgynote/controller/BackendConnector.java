@@ -1,11 +1,21 @@
 package com.bitsplease.fridgynote.controller;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.bitsplease.fridgynote.utils.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class BackendConnector {
 
-    public static boolean isTagKnown(String tagId) {
+    public static boolean isTagKnown(Context context, SharedPreferences prefs, String tagId) {
+        Reminders r = Reminders.getReminders(prefs);
+        if(r.hasReminder(tagId)) {
+            return true;
+        }
         return false;
     }
 
@@ -42,6 +52,10 @@ public class BackendConnector {
         return res;
     }
 
+    public static Reminders getReminders(SharedPreferences preferences) {
+        return Reminders.getReminders(preferences);
+    }
+
     public static List<Note> getUnassignedNodes() {
         return new ArrayList<>();
     }
@@ -51,9 +65,16 @@ public class BackendConnector {
         return false;
     }
 
-    public static boolean createReminderTag(String tagId, String name) {
-        // TODO codar
-        return false;
+    public static boolean createReminderTag(SharedPreferences prefs, String tagId, String name) {
+        Reminders r = Reminders.getReminders(prefs);
+        Log.d("FN-", "here1");
+        if(r.hasReminder(tagId)) {
+            Log.d("FN-", "here2");
+            return false;
+        }
+        Log.d("FN-", "here3");
+        r.addReminder(tagId, name);
+        return true;
     }
 
     public static boolean createShoppingItemTag(String tagId, String name, ListNote listNote) {

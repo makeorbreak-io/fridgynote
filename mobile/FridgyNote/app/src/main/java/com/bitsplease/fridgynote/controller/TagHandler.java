@@ -1,7 +1,9 @@
 package com.bitsplease.fridgynote.controller;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.bitsplease.fridgynote.activities.ListNoteActivity;
@@ -11,23 +13,29 @@ import com.bitsplease.fridgynote.utils.Constants;
 
 public class TagHandler {
 
-    public static void handleTag(Activity activity, String tagId) {
+    public static boolean handleTag(Context context, SharedPreferences prefs, String tagId) {
         if (tagId == null || tagId.isEmpty()) {
-            return;
+            return false;
         }
 
-        if (BackendConnector.isTagKnown(tagId)) {
+        if (BackendConnector.isTagKnown(context, prefs, tagId)) {
+            Reminders r = Reminders.getReminders(prefs);
+            if(r.hasReminder(tagId)) {
+                Reminders.setReminder(context, r.getReminder(tagId));
+                return true;
+            }
             // TODO get tag type and launch activity/trigger
         } else {
-            launchNewTagActivity(activity, tagId);
+            launchNewTagActivity(context, tagId);
         }
+        return false;
     }
 
-    public static void launchNewTagActivity(Activity activity, String tagId) {
-        Intent intent = new Intent(activity, NewTagActivity.class);
+    public static void launchNewTagActivity(Context context, String tagId) {
+        Intent intent = new Intent(context, NewTagActivity.class);
         Bundle b = new Bundle();
         b.putString(Constants.EXTRA_TAGID, tagId);
         intent.putExtras(b);
-        activity.startActivity(intent);
+        context.startActivity(intent);
     }
 }
