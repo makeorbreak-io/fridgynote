@@ -8,6 +8,7 @@ public class Note {
     private String mTagId;
     private String mOwner;
     private List<String> mShared;
+    private List<String> mLabels;
 
     public Note(String id) {
         mId = id;
@@ -39,6 +40,10 @@ public class Note {
 
     public List<String> getSharedUsers() {
         return mShared;
+    }
+
+    public List<String> getLabels() {
+        return mLabels;
     }
 
     public List<String> getAllUsers() {
