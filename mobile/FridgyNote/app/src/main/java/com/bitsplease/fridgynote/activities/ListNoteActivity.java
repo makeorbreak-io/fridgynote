@@ -23,6 +23,8 @@ import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
+import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.ImageLoader;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ListNoteActivity extends AppCompatActivity {
+public class ListNoteActivity extends AppCompatActivity implements BackEndCallback {
 
     private View mContainer;
     private TextView mTitleText;
@@ -51,9 +53,8 @@ public class ListNoteActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getListNote(mNoteId);
 
-        setupUi();
+        BackendConnector.getNoteTags(this, this);
     }
 
     @Override
@@ -222,5 +223,20 @@ public class ListNoteActivity extends AppCompatActivity {
         Snackbar mySnackbar = Snackbar.make(mContainer, "Item added to shopping list",
                 Snackbar.LENGTH_SHORT);
         mySnackbar.show();
+    }
+
+    @Override
+    public void tagNotesCallback(List<Note> response) {
+        for(Note n : response) {
+            if(!(n instanceof ListNote)) {
+                continue;
+            }
+            ListNote note = (ListNote) n;
+            mNote = note;
+            if(note.getId().equals(mNoteId)) {
+                break;
+            }
+        }
+        setupUi();
     }
 }

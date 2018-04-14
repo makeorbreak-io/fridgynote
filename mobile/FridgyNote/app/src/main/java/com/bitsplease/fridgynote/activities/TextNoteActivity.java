@@ -28,7 +28,10 @@ import android.widget.Toast;
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.LabelViewItem;
+import com.bitsplease.fridgynote.controller.ListNote;
+import com.bitsplease.fridgynote.controller.Note;
 import com.bitsplease.fridgynote.controller.TextNote;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.ImageLoader;
 import com.bitsplease.fridgynote.utils.ImageUploadCallback;
@@ -42,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TextNoteActivity extends AppCompatActivity implements ImageUploadCallback {
+public class TextNoteActivity extends AppCompatActivity implements ImageUploadCallback, BackEndCallback {
     private static final String TAG = "FN-TextNoteAct";
     public static final int GET_FROM_GALLERY = 3;
     public static final int REQUEST_IMAGE_CAPTURE = 1000;
@@ -64,9 +67,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
 
         Bundle b = getIntent().getExtras();
         mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getTextNote(mNoteId);
-
-        setupUi();
+        BackendConnector.getNoteTags(this, this);
     }
 
     @Override
@@ -281,5 +282,20 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
     public void newImageId(String id) {
         mNote.getImages().add(id);
         BackendConnector.uploadTextNote(this, mNote);
+    }
+
+    @Override
+    public void tagNotesCallback(List<Note> response) {
+        for(Note n : response) {
+            if(!(n instanceof TextNote)) {
+                continue;
+            }
+            TextNote note = (TextNote) n;
+            mNote = note;
+            if(note.getId().equals(mNoteId)) {
+                break;
+            }
+        }
+        setupUi();
     }
 }
