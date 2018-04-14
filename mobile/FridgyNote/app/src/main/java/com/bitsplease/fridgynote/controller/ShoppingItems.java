@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Pair;
 
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.utils.Constants;
@@ -21,7 +22,7 @@ import java.util.Set;
 public class ShoppingItems implements Serializable {
     private static ShoppingItems instance;
 
-    private Map<String, String> shoppingItems;
+    private Map<String, Pair<String, String>> shoppingItems;
 
     private ShoppingItems() {
         shoppingItems = new HashMap<>();
@@ -33,22 +34,22 @@ public class ShoppingItems implements Serializable {
         }
     }
 
-    public String getShoppingItem(String tag) {
+    public Pair<String, String> getShoppingItem(String tag) {
         if (!shoppingItems.containsKey(tag)) {
             return null;
         }
         return shoppingItems.get(tag);
     }
 
-    public void addShoppingItem(String tag, String value) {
-        addShoppingItem(tag, value, true);
+    public void addShoppingItem(String tag, String name, String list) {
+        addShoppingItem(tag, name, list, true);
     }
 
-    private void addShoppingItem(String tag, String value, boolean updatePrefs) {
+    private void addShoppingItem(String tag, String name, String list, boolean updatePrefs) {
         if (shoppingItems.containsKey(tag)) {
             shoppingItems.remove(tag);
         }
-        shoppingItems.put(tag, value);
+        shoppingItems.put(tag, new Pair<>(name, list));
         if (updatePrefs) {
             updatePreferences();
         }
@@ -87,7 +88,11 @@ public class ShoppingItems implements Serializable {
                 if (keyValue.length != 2) {
                     continue;
                 }
-                addShoppingItem(keyValue[0], keyValue[1], false);
+                String[] itemList = keyValue[1].split("<");
+                if (itemList.length != 2) {
+                    continue;
+                }
+                addShoppingItem(keyValue[0], itemList[0], itemList[1], false);
             }
         }
 
@@ -112,7 +117,9 @@ public class ShoppingItems implements Serializable {
         for (String s : keySet) {
             builder.append(s);
             builder.append(";");
-            builder.append(shoppingItems.get(s));
+            builder.append(shoppingItems.get(s).first);
+            builder.append("<");
+            builder.append(shoppingItems.get(s).second);
             builder.append("#");
         }
         return builder.toString();

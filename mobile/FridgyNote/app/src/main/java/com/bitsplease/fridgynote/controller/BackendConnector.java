@@ -132,7 +132,7 @@ public class BackendConnector {
         if (r.hasShoppingItem(tagId)) {
             return false;
         }
-        r.addShoppingItem(tagId, name);
+        r.addShoppingItem(tagId, name, listNote.getId());
         return true;
     }
 
