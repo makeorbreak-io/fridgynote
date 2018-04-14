@@ -28,8 +28,6 @@ public class TagNotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_notes);
-        //TextNote test = new TextNote("123","dada","xrdcfvgbshd",new ArrayList<String>());
-        //createNoteList(Arrays.asList(test));
 
         Bundle b = getIntent().getExtras();
         final String noteId = b != null ? b.getString(Constants.EXTRA_TAGID, "") : "";

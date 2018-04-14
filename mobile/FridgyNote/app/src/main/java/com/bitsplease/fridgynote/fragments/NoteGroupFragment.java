@@ -2,6 +2,7 @@ package com.bitsplease.fridgynote.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -9,11 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.activities.LoginActivity;
+import com.bitsplease.fridgynote.activities.TagNotesActivity;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.Note;
@@ -37,8 +41,7 @@ import java.util.Map;
 
 public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
-    List<TextNote> textNotes = new ArrayList<>();
-    List<ListNote> listNotes = new ArrayList<>();
+    Map<String, String> idMap = new HashMap<>();
 
 
     View view;
@@ -49,6 +52,8 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
         view = inflater.inflate(R.layout.notes_group_fragment_layout,
                 container, false);
+
+
 
 
         BackendConnector.getNoteTags(getActivity(), this);
@@ -68,11 +73,13 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
             while(iterator.hasNext()){
                 Map.Entry pair = (Map.Entry) iterator.next();
                 notesLocation.add(String.valueOf(pair.getValue()));
+                idMap.put(String.valueOf(pair.getValue()), String.valueOf(pair.getKey()));
             }
         }
 
         notesLocation.add("Tostas tens de corrigir isto");
         notesLocation.add("Não te esqueças");
+        notesLocation.add("Não me esqueci :*");
         if(notes != null){
             for (Note n : notes){
                 if(n.getTagId() == null || n.getTagId().equals("")){
@@ -84,10 +91,29 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
         String[] values = notesLocation.toArray(new String[0]);
 
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 R.layout.note_group_row, R.id.label_note, values);
         ListView rv = view.findViewById(R.id.notes_groups);
         rv.setAdapter(adapter);
+        rv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View v,
+                                    int position, long arg3) {
+
+                TextView tv = v.findViewById(R.id.label_note);
+
+                String tagId = idMap.get(tv.getText());
+
+                Intent intent = new Intent(getActivity(), TagNotesActivity.class);
+                intent.putExtra("tagId", tagId);
+                startActivity(intent);
+
+            }
+        });
+
+
     }
 
 

@@ -19,16 +19,19 @@ import android.widget.Toast;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
+import com.bitsplease.fridgynote.controller.Note;
 import com.bitsplease.fridgynote.controller.Reminders;
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.fragments.NoteGroupFragment;
 import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;
 import com.bitsplease.fridgynote.fragments.MemoFragment;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity {
@@ -37,6 +40,7 @@ public class MainActivity extends FragmentActivity {
     private NfcWrapper mNfcWrapper;
 
     private FragmentManager fragmentManager;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -66,6 +70,8 @@ public class MainActivity extends FragmentActivity {
         }
     };
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +100,13 @@ public class MainActivity extends FragmentActivity {
         //mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        BackendConnector.getNoteTags(this, new BackEndCallback() {
+            @Override
+            public void tagNotesCallback(List<Note> response) {
+                Log.d("FN-test", "" + response.size());
+            }
+        });
     }
 
     protected void onResume() {
