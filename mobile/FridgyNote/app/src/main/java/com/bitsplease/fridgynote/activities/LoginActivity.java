@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
         sharedPreferences = PreferenceUtils.getPrefs();
         if (!sharedPreferences.getString(Constants.KEY_USERNAME, "").equals("")) {
-            Intent intent = new Intent(this, EditTextNoteActivity.class);
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
         }
