@@ -42,6 +42,7 @@ public class ListNoteActivity extends AppCompatActivity {
     private Button mShareButton;
 
     private ListNote mNote;
+    private String mNoteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,8 @@ public class ListNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_note);
 
         Bundle b = getIntent().getExtras();
-        String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getListNote(noteId);
+        mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        mNote = BackendConnector.getListNote(mNoteId);
 
         setupUi();
     }
@@ -67,7 +68,8 @@ public class ListNoteActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
-                //TODO re-sync activity;
+                mNote = BackendConnector.getListNote(mNoteId);
+                setupUi();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

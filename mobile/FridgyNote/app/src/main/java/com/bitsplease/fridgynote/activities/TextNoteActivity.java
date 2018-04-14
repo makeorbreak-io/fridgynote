@@ -55,6 +55,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
     private Button mShareButton;
 
     private TextNote mNote;
+    private String mNoteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +63,8 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         setContentView(R.layout.activity_text_note);
 
         Bundle b = getIntent().getExtras();
-        String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getTextNote(noteId);
+        mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        mNote = BackendConnector.getTextNote(mNoteId);
 
         setupUi();
     }
@@ -80,7 +81,8 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
-                //TODO re-sync activity;
+                mNote = BackendConnector.getTextNote(mNoteId);
+                setupUi();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
