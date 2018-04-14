@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 function connect() {
     const connectionString = fs.readFileSync('./database/config.txt').toString();
     console.log(connectionString)
-    mongoose.connect(connectionString,{dbName:'fridgynote'})
+    mongoose.connect(connectionString, { dbName: 'fridgynote' })
         .then(() => {
             console.log('Database Connected')
         })
@@ -15,7 +15,7 @@ function connect() {
 const userTagSchema = new Schema({
     userId: String,
     tagId: String
-}, { _id: false})
+}, { _id: false })
 
 const textNoteSchema = new Schema({
     title: String,
@@ -111,30 +111,48 @@ function populate() {
 
     })
 
-
-
 }
 
-function getNoteByUser(userId){
+function createNewListItem(body, listId, owner, shared, tagId) {
+    const item = new ListItem({
+        body: body,
+        listId: listId,
+        owner: owner,
+        tagId: tagId,
+        shared: shared
+    })
+    return item.save()
+}
 
-    var promise1 = TextNote.find( { $or: [ { 'owner.userId': userId }, { shared: {$elemMatch: {userId: userId }}}]});
+function createNewTextNote(title, body, images, owner, shared, labels) {
+    const textNote = new ListItem({
+        title: title,
+        body: body,
+        images: images,
+        owner: owner,
+        labels: labels
+    })
+    return textNote.save()
+}
 
-    var promise2 = ListNote.find({ $or: [ {'owner.userId': userId }, { shared: {$elemMatch: {userId: userId }}}]});
+function getNoteByUser(userId) {
 
-    var promise3 = ListItem.find({ $or: [ { owner : userId}, { shared : userId}]});
+    var promise1 = TextNote.find({ $or: [{ 'owner.userId': userId }, { shared: { $elemMatch: { userId: userId } } }] });
 
-    Promise.all([promise1, promise2, promise3]).then(function(values) {
+    var promise2 = ListNote.find({ $or: [{ 'owner.userId': userId }, { shared: { $elemMatch: { userId: userId } } }] });
 
-        const textNote = {'key': 'textNote', 'values': JSON.stringify(values[0])};
-        const listNote = {'key': 'listNote', 'values': JSON.stringify(values[1])};
-        const listItem = {'key': 'listItem', 'values': JSON.stringify(values[2])};
-        
-        return [textNote, listNote, listItem];
-      });
+    var promise3 = ListItem.find({ $or: [{ owner: userId }, { shared: userId }] });
+
+    return Promise.all([promise1, promise2, promise3]).then(function (values) {
+        const joined = {
+            'textNote': values[0],
+            'listNote': values[1], 
+            'listItem': values[2],
+        }
+
+        return Promise.resolve(joined);
+    });
 };
 
-getNoteByUser('moura');
-
-
-module.exports = { connect, populate }
+module.exports = { connect, populate, createNewListItem, getNoteByUser, createNewTextNote }
 
