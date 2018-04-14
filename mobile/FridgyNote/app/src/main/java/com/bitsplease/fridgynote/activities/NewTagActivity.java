@@ -21,6 +21,7 @@ import com.bitsplease.fridgynote.controller.TagHandler;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +102,7 @@ public class NewTagActivity extends AppCompatActivity {
                         break;
                     case 2:
                         // REMINDER TAG
-                        boolean reminderCreated = BackendConnector.createReminderTag(getPreferences(Context.MODE_PRIVATE), tagId, tagTitle);
+                        boolean reminderCreated = BackendConnector.createReminderTag(tagId, tagTitle);
                         if(reminderCreated) {
                             Toast.makeText(NewTagActivity.this, "Reminder tag created", Toast.LENGTH_SHORT).show();
                             finish();
@@ -168,7 +169,7 @@ public class NewTagActivity extends AppCompatActivity {
         if (mNfcWrapper != null) {
             String res = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + res);
-            if (!BackendConnector.isTagKnown(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), res)) {
+            if (!BackendConnector.isTagKnown(getApplicationContext(), res)) {
                 tagIdText.setText(res);
             }
         }

@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -20,6 +21,7 @@ import com.bitsplease.fridgynote.fragments.NoteGroupFragment;
 import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;
 import com.bitsplease.fridgynote.fragments.MemoFragment;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "FN-MainActivity";
@@ -73,7 +75,7 @@ public class MainActivity extends FragmentActivity {
             mNfcWrapper = new NfcWrapper(this);
             String readTag = mNfcWrapper.handleIntent(getIntent());
             Log.d(TAG, "Activity start read => " + readTag);
-            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag);
+            TagHandler.handleTag(getApplicationContext(), readTag);
         } catch (NfcWrapper.NfcWrapperException e) {
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -108,7 +110,7 @@ public class MainActivity extends FragmentActivity {
         if (mNfcWrapper != null) {
             String readTag = mNfcWrapper.handleIntent(intent);
             Log.d(TAG, "Activity active read => " + readTag);
-            TagHandler.handleTag(getApplicationContext(), getPreferences(Context.MODE_PRIVATE), readTag);
+            TagHandler.handleTag(getApplicationContext(), readTag);
         }
     }
 

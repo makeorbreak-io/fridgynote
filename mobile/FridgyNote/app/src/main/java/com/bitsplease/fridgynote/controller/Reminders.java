@@ -1,13 +1,22 @@
 package com.bitsplease.fridgynote.controller;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.utils.Constants;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,18 +26,16 @@ import java.util.Set;
 public class Reminders implements Serializable {
     private static Reminders instance;
 
-    private SharedPreferences preferences;
     private Map<String, String> reminders;
 
-    private Reminders(SharedPreferences appPreferences) {
-        preferences = appPreferences;
+    private Reminders() {
         reminders = new HashMap<>();
 
-        Log.d("FN-", "parsing");
-        if (preferences.contains(Constants.KEY_REMINDERS)) {
-            parseString(preferences.getString(Constants.KEY_REMINDERS, ""));
+        SharedPreferences preferences = PreferenceUtils.getPrefs();
+        String reminders = preferences.getString(Constants.KEY_REMINDERS, "");
+        if (reminders.length() > 0) {
+            parseString(reminders);
         }
-        Log.d("FN-", "stuff " + toString());
     }
 
     public String getReminder(String tag) {
@@ -42,7 +49,7 @@ public class Reminders implements Serializable {
         addReminder(tag, value, true);
     }
 
-    public void addReminder(String tag, String value, boolean updatePrefs) {
+    private void addReminder(String tag, String value, boolean updatePrefs) {
         if (reminders.containsKey(tag)) {
             reminders.remove(tag);
         }
@@ -56,7 +63,7 @@ public class Reminders implements Serializable {
         deleteReminder(tag, true);
     }
 
-    public void deleteReminder(String tag, boolean updatePrefs) {
+    private void deleteReminder(String tag, boolean updatePrefs) {
         if (reminders.containsKey(tag)) {
             reminders.remove(tag);
         }
@@ -66,8 +73,10 @@ public class Reminders implements Serializable {
     }
 
     private void updatePreferences() {
+        SharedPreferences preferences = PreferenceUtils.getPrefs();
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(Constants.KEY_REMINDERS, toString());
+        String res = toString();
+        editor.putString(Constants.KEY_REMINDERS, res);
         editor.apply();
     }
 
@@ -79,7 +88,7 @@ public class Reminders implements Serializable {
         String[] tokens = str.split("#");
         for (String t : tokens) {
             if (t != null && !t.isEmpty()) {
-                String[] keyValue = t.split("|");
+                String[] keyValue = t.split(";");
                 if (keyValue.length != 2) {
                     continue;
                 }
@@ -94,23 +103,53 @@ public class Reminders implements Serializable {
         return reminders.containsKey(tag);
     }
 
-    public static Reminders getReminders(SharedPreferences preferences) {
-        if(instance != null) {
+    public static Reminders getReminders() {
+        if (instance != null) {
             return instance;
         }
-        instance = new Reminders(preferences);
+        instance = new Reminders();
         return instance;
     }
 
     public static void setReminder(Context context, String value) {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, Constants.KEY_REMINDERS)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle("FridgyNote")
-                .setContentText(value)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, Constants.KEY_REMINDERS)
+//                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+//                .setContentTitle("FridgyNote")
+//                .setContentText(value)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+//        notificationManager.notify(value.hashCode(), mBuilder.build());
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.notify(value.hashCode(), mBuilder.build());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            String id = "w01", name = "FridgyNote Reminder";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            String desc = "Reminders for the FridgyNote app.";
+
+            NotificationChannel channel = new NotificationChannel(id, name, importance);
+            channel.setDescription(desc);
+            notificationManager.createNotificationChannel(channel);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, id);
+            builder.setAutoCancel(false);
+            builder.setContentTitle("FridgyNote Reminder");
+            builder.setContentText(value);
+            //builder.setStyle(new Notification.BigTextStyle().bigText(data));
+            builder.setSmallIcon(R.drawable.ic_notifications_black_24dp);
+            //builder.setContentIntent(pendingIntent);
+            //if (Build.VERSION.SDK_INT >= 24) builder.setColor(Color.parseColor("#ff0000"));
+            Notification notification = builder.build();
+            notificationManager.notify(0, notification);
+        } else {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, Constants.KEY_REMINDERS)
+                    .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                    .setContentTitle("FridgyNote")
+                    .setContentText(value)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+            notificationManager.notify(value.hashCode(), mBuilder.build());
+        }
     }
 
     public String toString() {
@@ -118,11 +157,10 @@ public class Reminders implements Serializable {
         Set<String> keySet = reminders.keySet();
         for (String s : keySet) {
             builder.append(s);
-            builder.append("|");
+            builder.append(";");
             builder.append(reminders.get(s));
             builder.append("#");
         }
-        Log.d("FN-", "toStr " + builder.toString());
         return builder.toString();
     }
 }
