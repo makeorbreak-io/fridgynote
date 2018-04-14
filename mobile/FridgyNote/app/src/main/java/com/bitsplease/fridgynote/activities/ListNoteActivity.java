@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -38,6 +39,7 @@ public class ListNoteActivity extends AppCompatActivity {
     private TextView mTitleText;
     private LinearLayout mItemsLayout;
     private View mAddItem;
+    private Button mShareButton;
 
     private ListNote mNote;
 
@@ -77,7 +79,11 @@ public class ListNoteActivity extends AppCompatActivity {
         mTitleText = findViewById(R.id.note_title_text);
         mItemsLayout = findViewById(R.id.list_note_items_layout);
         mAddItem = findViewById(R.id.add_item);
+        mShareButton = findViewById(R.id.share_button);
 
+        while (mItemsLayout.getChildCount() > 1) {
+            mItemsLayout.removeViewAt(0);
+        }
         mTitleText.setText(mNote.getName());
         List<ListNoteItem> items = mNote.getItems();
         for (int i = 0; i < items.size(); ++i) {
@@ -122,6 +128,35 @@ public class ListNoteActivity extends AppCompatActivity {
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
             v.setText("" + keys.get(i).toUpperCase().charAt(0));
         }
+
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListNoteActivity.this);
+                builder.setTitle("Share note with user");
+
+                final EditText input = new EditText(ListNoteActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("User name");
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mNote.getSharedUsers().put(String.valueOf(input.getText()), "");
+                        BackendConnector.updateListNote(ListNoteActivity.this, mNote);
+                        setupUi();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
     }
 
     private int getUserSharedId(int index) {

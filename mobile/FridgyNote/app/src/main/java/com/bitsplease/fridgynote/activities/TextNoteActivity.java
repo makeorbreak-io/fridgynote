@@ -10,12 +10,15 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -49,6 +52,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
     private LinearLayout mImagesLayout;
     private ImageView mAddImageButton;
     private Spinner mLabelSpinner;
+    private Button mShareButton;
 
     private TextNote mNote;
 
@@ -88,10 +92,15 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         mBodyText = findViewById(R.id.note_body_text);
         mImagesLayout = findViewById(R.id.note_images_layout);
         mAddImageButton = findViewById(R.id.add_image_view);
+        mShareButton = findViewById(R.id.share_button);
         //mLabelSpinner = findViewById(R.id.label_spinner);
 
         mTitleText.setText(mNote.getTitle());
         mBodyText.setText(mNote.getBody());
+
+        while (mImagesLayout.getChildCount() > 1) {
+            mImagesLayout.removeViewAt(0);
+        }
 
         List<String> images = mNote.getImages();
         for (int i = 0; i < images.size(); ++i) {
@@ -121,6 +130,35 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
             v.setText("" + keys.get(i).toUpperCase().charAt(0));
         }
+
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TextNoteActivity.this);
+                builder.setTitle("Share note with user");
+
+                final EditText input = new EditText(TextNoteActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("User name");
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mNote.getSharedUsers().put(String.valueOf(input.getText()), "");
+                        BackendConnector.uploadTextNote(TextNoteActivity.this, mNote);
+                        setupUi();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
 
         //mLabelSpinner.setAdapter(new ArrayAdapter<LabelViewItem>());
     }
