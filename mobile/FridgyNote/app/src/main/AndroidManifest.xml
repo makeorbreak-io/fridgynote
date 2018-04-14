@@ -39,6 +39,7 @@
             android:label="New Tag" />
         <activity android:name=".activities.TextNoteActivity" />
         <activity android:name=".activities.ListNoteActivity" />
+        <activity android:name=".activities.TagNotesActivity" />
     </application>
 
 </manifest>
