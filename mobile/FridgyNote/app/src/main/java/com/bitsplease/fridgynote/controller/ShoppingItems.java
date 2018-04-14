@@ -24,7 +24,7 @@ public class ShoppingItems implements Serializable {
 
     private Map<String, Pair<String, String>> shoppingItems;
 
-    private ShoppingItems() {
+    public ShoppingItems() {
         shoppingItems = new HashMap<>();
 
         SharedPreferences preferences = PreferenceUtils.getPrefs();
@@ -43,6 +43,10 @@ public class ShoppingItems implements Serializable {
 
     public void addShoppingItem(String tag, String name, String list) {
         addShoppingItem(tag, name, list, true);
+    }
+
+    public int length(){
+        return shoppingItems.size();
     }
 
     private void addShoppingItem(String tag, String name, String list, boolean updatePrefs) {
@@ -74,6 +78,10 @@ public class ShoppingItems implements Serializable {
         String res = toString();
         editor.putString(Constants.KEY_SHOPPING_ITEMS, res);
         editor.apply();
+    }
+
+    public Set<String> getKeyset(){
+        return this.shoppingItems.keySet();
     }
 
     private void parseString(String str) {
