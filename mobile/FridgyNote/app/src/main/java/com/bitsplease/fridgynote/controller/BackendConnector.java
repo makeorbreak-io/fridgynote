@@ -119,7 +119,7 @@ public class BackendConnector {
     public static void uploadBitmap(Context context, final Bitmap bitmap, final ImageUploadCallback callback) {
         Log.d("FN-test", "uploading bitmap");
         RequestQueue queue = Volley.newRequestQueue(context);
-        final String url = "https://fridgynote.herokuapp.com/notes/image";
+        final String url = "https://fridgynote.herokuapp.com/notes/text/image";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
@@ -132,6 +132,7 @@ public class BackendConnector {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
             }
         }) {
             public Map<String, String> getHeaders() throws AuthFailureError {
