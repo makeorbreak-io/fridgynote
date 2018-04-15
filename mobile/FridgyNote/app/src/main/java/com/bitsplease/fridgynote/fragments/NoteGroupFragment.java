@@ -164,7 +164,20 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
                 TextView tv = v.findViewById(R.id.label_note);
 
-                String tagId = idMap.get(tv.getText());
+                Iterator it = idMap.entrySet().iterator();
+
+                String value = (String) tv.getText();
+
+                String tagId = "unassigned";
+
+                while(it.hasNext()){
+                    Map.Entry pair = (Map.Entry) it.next();
+                    if(pair.getValue().equals(value)){
+                        tagId = (String) pair.getKey();
+                    }
+                }
+
+
 
                 Intent intent = new Intent(getActivity(), TagNotesActivity.class);
                 intent.putExtra("tag", tagId);

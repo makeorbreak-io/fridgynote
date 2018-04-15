@@ -60,6 +60,7 @@ public class TagHandler {
             if(t.hasOwnedTag(tagId)) {
                 Log.d(TAG, "Owned tag");
                 Intent intent = new Intent(context, TagNotesActivity.class);
+                Log.e("FN-BUGGG", tagId);
                 intent.putExtra("tag", tagId);
                 context.startActivity(intent);
                 return true;
