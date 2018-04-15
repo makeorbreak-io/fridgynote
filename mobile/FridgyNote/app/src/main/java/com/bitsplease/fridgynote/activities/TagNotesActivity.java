@@ -55,21 +55,33 @@ public class TagNotesActivity extends AppCompatActivity {
     public void createNoteList(List<Note> notes){
         for(int i = 0; i< notes.size();i++){
             String title = "";
+            final boolean isTextNote;
+
             int id = getResources().getIdentifier("card" + (i + 1), "id", this.getPackageName());
             CardView cardView= findViewById(id);
 
             if(notes.get(i) instanceof TextNote){
                 title=((TextNote) notes.get(i)).getTitle();
+                isTextNote=true;
             }else if(notes.get(i) instanceof ListNote){
                 title = ((ListNote) notes.get(i)).getName();
+                isTextNote=false;
+            }else{
+                isTextNote=true;
             }
+
             ((TextView) ((LinearLayout)cardView.getChildAt(0)).getChildAt(0)).setText(title);
             cardView.setVisibility(View.VISIBLE);
             final String noteId = notes.get(i).getId();
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(TagNotesActivity.this, TextNoteActivity.class);
+                    Intent intent;
+                    if(isTextNote) {
+                         intent= new Intent(TagNotesActivity.this, TextNoteActivity.class);
+                    }else{
+                        intent = new Intent(TagNotesActivity.this, ListNote.class);
+                    }
                     intent.putExtra(Constants.EXTRA_NOTEID,noteId);
                     startActivity(intent);
                 }
