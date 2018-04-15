@@ -66,7 +66,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         setContentView(R.layout.activity_text_note);
 
         Bundle b = getIntent().getExtras();
-        mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        mNoteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "5ad29456892c3d00102fc710";
         BackendConnector.getNoteTags(this, this);
     }
 
