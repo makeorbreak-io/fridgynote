@@ -80,17 +80,16 @@ router.post('/text/image', function (req, res, next) {
 
 var fs = require('fs');
 var img = req.body;
-// strip off the data: url prefix to get just the base64-encoded bytes
-//var data = img.replace(/^data:image\/\w+;base64,/, "");
-//var buf = new Buffer(data, 'base64');
-var imgpath = 'image'+ "_" + Date.now() + ".png"
+console.log(req.body);
 
-    fs.writeFile('uploads/'+imgpath, img, function(err) {
-        if (err) 
-            console.log(err);
-            res.status(400).end();
-    });
-    res.json('https://fridgynote.herokuapp.com/'+imgpath);
+var imgpath = 'image'+ "_" + Date.now() + ".bmp"
+
+fs.writeFile('uploads/'+imgpath, img, function(err) {
+    if (err) 
+        console.log(err);
+        res.status(400).end();
+});
+res.json('https://fridgynote.herokuapp.com/'+imgpath);
 
 });
 
@@ -101,9 +100,7 @@ router.post('/text', [oneOf([check('title').exists(), check('body').exists(), ch
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
       }*/
-      console.log(req.files)
-      console.log(req.files.map(a => a.path));
-    db.createNewTextNote(req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
+    db.createNewTextNote(req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.tagId, req.body.shared, req.body.labels).then((textNote) => {
             console.log(textNote)
             res.json(textNote)
         })

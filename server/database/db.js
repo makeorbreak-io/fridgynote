@@ -25,7 +25,7 @@ const listNoteItemSchema = new Schema({
 const textNoteSchema = new Schema({
     title: String,
     body: String,
-    images: [{ path: String }],
+    images: [ String ],
     owner: userTagSchema,
     shared: [userTagSchema],
     labels: []
@@ -181,12 +181,12 @@ function processListItem(ownerId, tagId) {
         })
 }
 
-function createNewTextNote(title, body, images, owner, shared, labels) {
-    const textNote = new ListItem({
+function createNewTextNote(title, body, images, ownerId, tagId, shared, labels) {
+    const textNote = new TextNote({
         title: title,
         body: body,
         images: images,
-        owner: owner,
+        owner: { userId: ownerId, tagId: tagId },
         labels: labels
     })
     return textNote.save()
