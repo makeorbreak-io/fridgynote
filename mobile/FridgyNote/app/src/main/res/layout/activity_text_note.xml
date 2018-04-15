@@ -7,6 +7,7 @@
     tools:context="com.bitsplease.fridgynote.activities.TextNoteActivity">
 
     <ScrollView
+        android:id="@+id/text_note_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
