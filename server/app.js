@@ -13,7 +13,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'uploads')));
-app.use(bodyParser.text())
+app.use(bodyParser.json())
 
 db.connect();
 db.populate();

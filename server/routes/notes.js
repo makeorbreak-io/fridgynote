@@ -1,20 +1,11 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/db')
+const bodyParser = require('body-parser');
 const { check, validationResult, oneOf } = require('express-validator/check');
+const fs = require('fs');
 
-var multer = require('multer')
-var Storage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        callback(null, "uploads/");
-    },
-    filename: function (req, file, callback) {
-        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
-    }
-});
-var upload = multer({
-    storage: Storage
-}); //Field name and max count
+
 
 
 router.get('/me', check('Authorization').exists(), function (req, res) {
@@ -76,34 +67,34 @@ router.post('/list', [check('title').exists(), check('tagId').exists(), check('A
         })
 });
 
-router.post('/text/image', function (req, res, next) {
-
-    var fs = require('fs');
+router.post('/text/image',bodyParser.raw({limit: '50mb'}), function (req, res, next) {
+    
     var img = req.body;
-    console.log(req.body);
 
-    var imgpath = 'image' + "_" + Date.now() + ".bmp"
+    var imgpath = 'image' + "_" + Date.now() + ".png"
 
     fs.writeFile('uploads/' + imgpath, img, function (err) {
+        console.log('File Save')
+
         if (err) {
             console.log(err);
             res.status(400).end();
             return;
         }
 
-        res.json('https://fridgynote.herokuapp.com/' + imgpath);
+        res.send('https://fridgynote.herokuapp.com/' + imgpath);
     });
 
 
 });
 
 router.post('/text', [oneOf([check('title').exists(), check('body').exists(), check('labels').exists(), check('images').exists()]), check('Authorization').exists()], function (req, res, next) {
-    /*
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
-      }*/
+      }
+
     db.createNewTextNote(req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.tagId, req.body.shared, req.body.labels).then((textNote) => {
         console.log(textNote)
         res.json(textNote)
@@ -115,7 +106,7 @@ router.post('/text', [oneOf([check('title').exists(), check('body').exists(), ch
 });
 
 router.put('/text/:textId', [check('Authorization').exists(), oneOf([check('title').exists(), check('body').exists(), check('labels').exists(), check('images').exists()])], function (req, res, next) {
-    /* const errors = validationResult(req);
+    const errors = validationResult(req);
  
      console.log(req.body)
  
@@ -123,7 +114,6 @@ router.put('/text/:textId', [check('Authorization').exists(), oneOf([check('titl
          return res.status(422).json({ errors: errors.mapped() });
        }
  
- */
     db.updateTextNote(req.params.textId, req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
         console.log(textNote)
         res.json(textNote)
