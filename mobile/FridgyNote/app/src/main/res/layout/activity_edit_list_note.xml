@@ -24,8 +24,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Name" />
+                android:hint="Name"
+                android:inputType="textPersonName" />
 
             <LinearLayout
                 android:id="@+id/list_note_items_layout"
@@ -38,7 +38,8 @@
                     android:id="@+id/add_item"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="16dp">
+                    android:layout_marginTop="16dp"
+                    android:clickable="true">
 
                     <ImageView
                         android:id="@+id/imageView2"

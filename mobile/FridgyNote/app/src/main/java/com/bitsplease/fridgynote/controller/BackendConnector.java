@@ -162,7 +162,7 @@ public class BackendConnector {
 
     public static void updateListNote(Context context, final ListNote note) {
         RequestQueue queue = Volley.newRequestQueue(context);
-        final String url = "https://fridgynote.herokuapp.com/notes/list/" + note.getId();
+        final String url = "https://fridgynote.herokuapp.com/notes/list" ;
 
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url,
                 new Response.Listener<String>() {
@@ -192,6 +192,43 @@ public class BackendConnector {
 
         queue.add(stringRequest);
     }
+
+
+    public static void createListNote(Context context, final ListNote note) {
+        RequestQueue queue = Volley.newRequestQueue(context);
+        final String url = "https://fridgynote.herokuapp.com/notes/list" ;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("FN- RESPONSE", "Response is: " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
+            }
+        }) {
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap();
+                headers.put("Authorization", PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, "moura"));
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                Log.e("FN-BODY", note.toJSON().toString());
+                return note.toJSON().toString().getBytes();
+            }
+        };
+
+        queue.add(stringRequest);
+    }
+
+
 
     public static boolean createNoteTag(String tagId, String name) {
         OwnedNoteTags noteTag = OwnedNoteTags.getOwnedTags();

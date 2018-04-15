@@ -90,17 +90,25 @@ public class ListNote extends Note {
         return true;
     }
 
+    public void setItems(List<ListNoteItem> list){
+        mItems = list;
+    }
+
     @Override
     public JSONObject toJSON() {
         JSONObject obj = new JSONObject();
         try {
-            obj.put("_id", getId());
+            obj.put("tagId", getId());
             obj.put("title", mName);
             JSONObject owner = new JSONObject();
             owner.put("userId", getOwner().first);
             owner.put("tagId", getOwner().second);
             obj.put("owner", owner);
             Iterator it = getSharedUsers().entrySet().iterator();
+            if(!it.hasNext()){
+                JSONArray array = new JSONArray();
+                obj.put("shared", array);
+            }
             while(it.hasNext()){
                 JSONObject user = new JSONObject();
                 Map.Entry pair = (Map.Entry)it.next();

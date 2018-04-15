@@ -47,7 +47,6 @@ public class OwnedNoteTags {
     }
 
     private void addOwnedTag(String tag, String value, boolean updatePrefs) {
-        Log.d("FN-test", "actually adding " + tag + " " + value);
         if (ownedTags.containsKey(tag)) {
             ownedTags.remove(tag);
         }
@@ -109,6 +108,10 @@ public class OwnedNoteTags {
         }
         instance = new OwnedNoteTags();
         return instance;
+    }
+
+    public HashMap<String, String> getOwned(){
+        return new HashMap<>(ownedTags);
     }
 
     public static void setOwnedTag(Context context, String value) {

@@ -99,7 +99,7 @@ public class TextNote extends Note {
     public JSONObject toJSON() {
         JSONObject obj = new JSONObject();
         try {
-            obj.put("_id", getId());
+            obj.put("tagId", getId());
             obj.put("title", mTitle);
             JSONObject owner = new JSONObject();
             owner.put("userId", getOwner().first);

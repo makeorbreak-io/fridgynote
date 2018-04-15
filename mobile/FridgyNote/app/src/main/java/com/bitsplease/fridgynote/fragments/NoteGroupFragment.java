@@ -67,6 +67,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
         SharedPreferences prefs = PreferenceUtils.getPrefs();
         String s = prefs.getString(Constants.KEY_OWNED_TAGS, "");
+        Log.e("FN-DEBUGTAGS", s);
         if(!s.equals("")){
             Map<String, String>  tags  = parseString(s);
             Iterator iterator = tags.entrySet().iterator();
@@ -77,9 +78,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
             }
         }
 
-        notesLocation.add("Tostas tens de corrigir isto");
-        notesLocation.add("Não te esqueças");
-        notesLocation.add("Não me esqueci :*");
+
         if(notes != null){
             for (Note n : notes){
                 if(n.getTagId() == null || n.getTagId().equals("")){

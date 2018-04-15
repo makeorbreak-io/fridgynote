@@ -19,10 +19,18 @@ import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
 import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.controller.OwnedNoteTags;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class EditListNoteActivity extends AppCompatActivity {
 
@@ -31,6 +39,8 @@ public class EditListNoteActivity extends AppCompatActivity {
     private LinearLayout mItemsLayout;
     private View mAddItem;
     private FloatingActionButton mSubmitButton;
+    private boolean create;
+    private List<ListNoteItem> itemsList = new ArrayList<>();
 
     private ListNote mNote;
 
@@ -41,25 +51,33 @@ public class EditListNoteActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         final String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        BackendConnector.getNoteTags(this, new BackEndCallback() {
-            @Override
-            public void tagNotesCallback(List<Note> response) {
-                for (Note n : response) {
-                    if (n.getId().equals(noteId)) {
-                        mNote = (ListNote) n;
-                        break;
+        if(noteId.equals("")){
+            create = true;
+            setupUi();
+        }else{
+            create = false;
+            BackendConnector.getNoteTags(this, new BackEndCallback() {
+                @Override
+                public void tagNotesCallback(List<Note> response) {
+                    for (Note n : response) {
+                        if (n.getId().equals(noteId)) {
+                            mNote = (ListNote) n;
+                            break;
+                        }
+                    }
+                    if (mNote != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setupUi();
+                            }
+                        });
                     }
                 }
-                if (mNote != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setupUi();
-                        }
-                    });
-                }
-            }
-        });
+            });
+        }
+
+
     }
 
     private void setupUi() {
@@ -69,11 +87,14 @@ public class EditListNoteActivity extends AppCompatActivity {
         mAddItem = findViewById(R.id.add_item);
         mSubmitButton = findViewById(R.id.save_note);
 
-        mTitleText.setText(mNote.getName());
-        List<ListNoteItem> items = mNote.getItems();
-        for (int i = 0; i < items.size(); ++i) {
-            addListItem(items.get(i));
+        if(!create){
+            mTitleText.setText(mNote.getName());
+            List<ListNoteItem> items = mNote.getItems();
+            for (int i = 0; i < items.size(); ++i) {
+                addListItem(items.get(i));
+            }
         }
+
 
         mAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +137,7 @@ public class EditListNoteActivity extends AppCompatActivity {
         box.setText(item.getText());
         box.setChecked(item.isChecked());
         final int index = mItemsLayout.getChildCount() - 1;
-
+        itemsList.add(item);
         mItemsLayout.addView(box, index);
         box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -144,5 +165,47 @@ public class EditListNoteActivity extends AppCompatActivity {
 
     private void submit() {
         //TODO save note to backend
+
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setTitle("Choose tag for new note");
+
+        OwnedNoteTags ownedTagsObj = OwnedNoteTags.getOwnedTags();
+        HashMap<String, String> ownedTags = ownedTagsObj.getOwned();
+        List<String> tagsInt = new ArrayList<>();
+
+        Iterator it = ownedTags.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            tagsInt.add((String) pair.getKey());
+        }
+        final String[] tags = tagsInt.toArray(new String[0]);
+        b.setItems(tags, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if(mNote == null){
+                    mNote = new ListNote(tags[which], mTitleText.getText().toString(), itemsList);
+                    mNote.setOwner(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""), tags[which]);
+                    mNote.setSharedUsers(new HashMap<String, String>());
+                    BackendConnector.createListNote(EditListNoteActivity.this, mNote);
+                }else{
+                    mNote.setItems(itemsList);
+                    BackendConnector.updateListNote(EditListNoteActivity.this, mNote);
+                }
+
+
+
+
+                dialog.dismiss();
+
+            }
+
+        });
+
+        b.show();
+
+
+
     }
 }

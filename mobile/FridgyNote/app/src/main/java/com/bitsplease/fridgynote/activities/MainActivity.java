@@ -1,15 +1,19 @@
 package com.bitsplease.fridgynote.activities;
 
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +31,7 @@ import com.bitsplease.fridgynote.fragments.NoteGroupFragment;
 import com.bitsplease.fridgynote.fragments.ShoppingItemsFragment;
 import com.bitsplease.fridgynote.fragments.MemoFragment;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
+import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
 
@@ -34,7 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "FN-MainActivity";
 
     private NfcWrapper mNfcWrapper;
@@ -100,6 +105,35 @@ public class MainActivity extends FragmentActivity {
         //mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.action_bar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_add:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.dialog_add)
+                        .setItems(new String[]{"Text Note", "Shopping List Note"}, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(MainActivity.this, EditListNoteActivity.class);
+                                intent.putExtra(Constants.EXTRA_NOTEID, "");
+                                startActivity(intent);
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     protected void onResume() {
