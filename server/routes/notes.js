@@ -1,23 +1,23 @@
 var express = require('express');
 var router = express.Router();
 const db = require('../database/db')
-const { check, validationResult, oneOf} = require('express-validator/check');
+const { check, validationResult, oneOf } = require('express-validator/check');
 
-var multer  = require('multer')
+var multer = require('multer')
 var Storage = multer.diskStorage({
-    destination: function(req, file, callback) {
+    destination: function (req, file, callback) {
         callback(null, "uploads/");
     },
-    filename: function(req, file, callback) {
+    filename: function (req, file, callback) {
         callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
     }
 });
 var upload = multer({
-   storage: Storage
+    storage: Storage
 }); //Field name and max count
 
 
-router.get('/me',check('Authorization').exists(),function(req, res){
+router.get('/me', check('Authorization').exists(), function (req, res) {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -78,18 +78,22 @@ router.post('/list', [check('title').exists(), check('tagId').exists(), check('A
 
 router.post('/text/image', function (req, res, next) {
 
-var fs = require('fs');
-var img = req.body;
-console.log(req.body);
+    var fs = require('fs');
+    var img = req.body;
+    console.log(req.body);
 
-var imgpath = 'image'+ "_" + Date.now() + ".bmp"
+    var imgpath = 'image' + "_" + Date.now() + ".bmp"
 
-fs.writeFile('uploads/'+imgpath, img, function(err) {
-    if (err) 
-        console.log(err);
-        res.status(400).end();
-});
-res.json('https://fridgynote.herokuapp.com/'+imgpath);
+    fs.writeFile('uploads/' + imgpath, img, function (err) {
+        if (err) {
+            console.log(err);
+            res.status(400).end();
+            return;
+        }
+
+        res.json('https://fridgynote.herokuapp.com/' + imgpath);
+    });
+
 
 });
 
@@ -101,38 +105,38 @@ router.post('/text', [oneOf([check('title').exists(), check('body').exists(), ch
         return res.status(422).json({ errors: errors.mapped() });
       }*/
     db.createNewTextNote(req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.tagId, req.body.shared, req.body.labels).then((textNote) => {
-            console.log(textNote)
-            res.json(textNote)
-        })
+        console.log(textNote)
+        res.json(textNote)
+    })
         .catch((err) => {
             console.log(err)
             res.status(400).end()
         });
 });
 
-router.put('/text/:textId', [check('Authorization').exists(), oneOf([check('title').exists(), check('body').exists(), check('labels').exists(),  check('images').exists()])], function (req, res, next) {
-   /* const errors = validationResult(req);
-
-    console.log(req.body)
-
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.mapped() });
-      }
-
-*/
-    db.updateTextNote(req.params.textId, req.body.title, req.body.body, req.body.images , req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
-            console.log(textNote)
-            res.json(textNote)
-        })
+router.put('/text/:textId', [check('Authorization').exists(), oneOf([check('title').exists(), check('body').exists(), check('labels').exists(), check('images').exists()])], function (req, res, next) {
+    /* const errors = validationResult(req);
+ 
+     console.log(req.body)
+ 
+     if (!errors.isEmpty()) {
+         return res.status(422).json({ errors: errors.mapped() });
+       }
+ 
+ */
+    db.updateTextNote(req.params.textId, req.body.title, req.body.body, req.body.images, req.get('Authorization'), req.body.shared, req.body.labels).then((textNote) => {
+        console.log(textNote)
+        res.json(textNote)
+    })
         .catch((err) => {
             console.log(err)
             res.status(400).end()
         });
 
-      
+
 });
 
-router.put('/list/:id', [check('Authorization').exists(),oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])], function (req, res) {
+router.put('/list/:id', [check('Authorization').exists(), oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])], function (req, res) {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
