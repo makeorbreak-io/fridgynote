@@ -47,6 +47,7 @@ public class OwnedNoteTags {
     }
 
     private void addOwnedTag(String tag, String value, boolean updatePrefs) {
+        Log.d("FN-test", "actually adding " + tag + " " + value);
         if (ownedTags.containsKey(tag)) {
             ownedTags.remove(tag);
         }
@@ -125,6 +126,7 @@ public class OwnedNoteTags {
         StringBuilder builder = new StringBuilder();
         Set<String> keySet = ownedTags.keySet();
         for (String s : keySet) {
+            builder.append(s);
             builder.append(";");
             builder.append(ownedTags.get(s));
             builder.append("#");

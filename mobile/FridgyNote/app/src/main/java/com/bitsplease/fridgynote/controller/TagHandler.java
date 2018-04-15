@@ -5,30 +5,37 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
 import com.bitsplease.fridgynote.activities.ListNoteActivity;
 import com.bitsplease.fridgynote.activities.NewTagActivity;
+import com.bitsplease.fridgynote.activities.TagNotesActivity;
 import com.bitsplease.fridgynote.activities.TextNoteActivity;
 import com.bitsplease.fridgynote.utils.Constants;
 
 public class TagHandler {
+    private static final String TAG = "FN-TagHandler";
 
     public static boolean handleTag(Context context, String tagId) {
+        Log.d(TAG, "Handling tag " + tagId);
         if (tagId == null || tagId.isEmpty()) {
             return false;
         }
 
         if (BackendConnector.isTagKnown(context, tagId)) {
+            Log.d(TAG, "Known");
             Reminders r = Reminders.getReminders();
             if(r.hasReminder(tagId)) {
+                Log.d(TAG, "Reminder");
                 Reminders.setReminder(context, r.getReminder(tagId));
                 return true;
             }
 
             ShoppingItems s = ShoppingItems.getShoppingItems();
             if(s.hasShoppingItem(tagId)) {
+                Log.d(TAG, "Shopping Item");
                 Pair<String,String> noteName = s.getShoppingItem(tagId);
                 ListNote note = BackendConnector.getListNote(noteName.second);
                 if(note == null) {
@@ -37,6 +44,15 @@ public class TagHandler {
                 }
                 note.addItem(noteName.first);
                 BackendConnector.updateListNote(context, note);
+                return true;
+            }
+
+            OwnedNoteTags t = OwnedNoteTags.getOwnedTags();
+            if(t.hasOwnedTag(tagId)) {
+                Log.d(TAG, "Owned tag");
+                Intent intent = new Intent(context, TagNotesActivity.class);
+                intent.putExtra("tag", tagId);
+                context.startActivity(intent);
                 return true;
             }
             

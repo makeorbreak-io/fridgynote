@@ -100,13 +100,6 @@ public class MainActivity extends FragmentActivity {
         //mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        BackendConnector.getNoteTags(this, new BackEndCallback() {
-            @Override
-            public void tagNotesCallback(List<Note> response) {
-                Log.d("FN-test", "" + response.size());
-            }
-        });
     }
 
     protected void onResume() {

@@ -75,13 +75,13 @@ public class NewTagActivity extends AppCompatActivity {
                             "You must choose a title for the NFC tag.");
                     return;
                 }
-                String tagId = tagIdText.getText().toString();
+                final String tagId = NewTagActivity.this.tagId;
+                Log.d("FN-test", "adding " + tagId);
                 String tagTitle = tagTitleText.getText().toString();
                 int type = spinner.getSelectedItemPosition();
                 switch (type) {
                     case 0:
                         // NOTE TAG
-
                         boolean noteCreated = BackendConnector.createNoteTag(tagId, tagTitle);
                         if(noteCreated) {
                             Toast.makeText(NewTagActivity.this, "Note tag created", Toast.LENGTH_SHORT).show();
