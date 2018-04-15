@@ -6,8 +6,7 @@ const { check, validationResult, oneOf } = require('express-validator/check');
 const fs = require('fs');
 const WebSocket = require('ws');
 
-
-
+const wss = new WebSocket.Server({ port: 3001 });
 
 
 router.post('/send/:textId',check('Authorization').exists(),function(req,res){
@@ -20,7 +19,6 @@ router.post('/send/:textId',check('Authorization').exists(),function(req,res){
     db.findTextNotebyId(req.params.textId)
         .then((textNote)=>{
             console.log(textNote);
-            const wss = new WebSocket.Server({ port: 3001 });
             wss.on('connection', function connection(ws) {
                 console.log('Connect Client')
                 ws.send(JSON.stringify(textNote));
