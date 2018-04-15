@@ -19,12 +19,14 @@ public class TextNote extends Note {
     private String mTitle;
     private String mBody;
     private List<String> mImages;
+    private List<String> mLabels;
 
     public TextNote(String id, String title, String body, List<String> images) {
         super(id);
         mTitle = title;
         mBody = body;
         mImages = images;
+
     }
 
     public TextNote(JSONObject textNote) throws JSONException {
@@ -105,7 +107,12 @@ public class TextNote extends Note {
             owner.put("userId", getOwner().first);
             owner.put("tagId", getOwner().second);
             obj.put("owner", owner);
+            obj.put("body", mBody);
             Iterator it = getSharedUsers().entrySet().iterator();
+            if(!it.hasNext()){
+                JSONArray array = new JSONArray();
+                obj.put("shared", array);
+            }
             while(it.hasNext()){
                 JSONObject user = new JSONObject();
                 Map.Entry pair = (Map.Entry)it.next();
@@ -114,12 +121,30 @@ public class TextNote extends Note {
                 obj.accumulate("shared", user);
             }
 
+            if(mImages.size() == 0){
+                obj.put("images", new JSONArray());
+            }
             for(String s : mImages) {
                 obj.accumulate("images", s);
+            }
+            if(mLabels.size() == 0){
+                obj.put("labels", new JSONArray());
+            }
+            for(String s : mLabels) {
+                obj.accumulate("labels", s);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    @Override
+    public List<String> getLabels() {
+        return mLabels;
+    }
+
+    public void setLabels(List<String> labels) {
+        this.mLabels = labels;
     }
 }

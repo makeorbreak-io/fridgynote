@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class NoteGroupFragment extends Fragment implements BackEndCallback {
@@ -83,15 +84,20 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
                 String value = tv.getText().toString();
 
                 SharedPreferences prefs = PreferenceUtils.getPrefs();
+
                 while(it.hasNext()){
                     Map.Entry pair = (Map.Entry) it.next();
                     Log.e("FN-DELETE", (String) pair.getValue());
                     if(value.equals(pair.getValue())){
 
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.remove((String) pair.getKey());
+                        String key = (String) pair.getKey();
+                        idMap.remove(key);
+
+                        editor.putString(Constants.KEY_OWNED_TAGS, toString(idMap));
+                        Log.e("FN-DELETE2", prefs.getString(key, " asdasd"));
                         editor.apply();
-                        idMap.remove(pair.getKey());
+
                         break;
                     }
                 }
@@ -100,6 +106,18 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    public String toString(Map<String,String> idMap) {
+        StringBuilder builder = new StringBuilder();
+        Set<String> keySet = idMap.keySet();
+        for (String s : keySet) {
+            builder.append(s);
+            builder.append(";");
+            builder.append(idMap.get(s));
+            builder.append("#");
+        }
+        return builder.toString();
     }
 
 
@@ -116,7 +134,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
             while(iterator.hasNext()){
                 Map.Entry pair = (Map.Entry) iterator.next();
                 notesLocation.add(String.valueOf(pair.getValue()));
-                idMap.put(String.valueOf(pair.getValue()), String.valueOf(pair.getKey()));
+                idMap.put(String.valueOf(pair.getKey()), String.valueOf(pair.getValue()));
             }
         }
 

@@ -53,7 +53,12 @@ public class EditListNoteActivity extends AppCompatActivity {
         final String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
         if(noteId.equals("")){
             create = true;
-            setupUi();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setupUi();
+                }
+            });
         }else{
             create = false;
             BackendConnector.getNoteTags(this, new BackEndCallback() {

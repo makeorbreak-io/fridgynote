@@ -123,9 +123,19 @@ public class MainActivity extends AppCompatActivity {
                 builder.setTitle(R.string.dialog_add)
                         .setItems(new String[]{"Text Note", "Shopping List Note"}, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(MainActivity.this, EditListNoteActivity.class);
-                                intent.putExtra(Constants.EXTRA_NOTEID, "");
-                                startActivity(intent);
+                                switch(which){
+                                    case 0:
+                                        Intent intent = new Intent(MainActivity.this, EditTextNoteActivity.class);
+                                        intent.putExtra(Constants.EXTRA_NOTEID, "");
+                                        startActivity(intent);
+                                        break;
+                                    case 1:
+                                        intent = new Intent(MainActivity.this, EditListNoteActivity.class);
+                                        intent.putExtra(Constants.EXTRA_NOTEID, "");
+                                        startActivity(intent);
+                                        break;
+                                }
+
                             }
                         });
                 AlertDialog alertDialog = builder.create();

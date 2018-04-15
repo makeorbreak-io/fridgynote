@@ -20,17 +20,22 @@ import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.controller.OwnedNoteTags;
 import com.bitsplease.fridgynote.controller.TextNote;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.ImageLoader;
+import com.bitsplease.fridgynote.utils.PreferenceUtils;
 import com.bitsplease.fridgynote.utils.SizeUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class EditTextNoteActivity extends AppCompatActivity {
     private static final String TAG = "FN-EditTextNoteAct";
@@ -46,6 +51,8 @@ public class EditTextNoteActivity extends AppCompatActivity {
     private FloatingActionButton mSubmitButton;
     private List<Bitmap> newCustomBitmaps;
 
+    private boolean create;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +62,19 @@ public class EditTextNoteActivity extends AppCompatActivity {
         newCustomBitmaps = new ArrayList<>();
         Bundle b = getIntent().getExtras();
         final String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        if(noteId.equals("")){
+            create = true;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setupUi();
+                }
+            });
+        }
         BackendConnector.getNoteTags(this, new BackEndCallback() {
             @Override
             public void tagNotesCallback(List<Note> response) {
+                create = false;
                 for(Note n : response) {
                     if(n.getId().equals(noteId)) {
                         mNote = (TextNote) n;
@@ -83,51 +100,59 @@ public class EditTextNoteActivity extends AppCompatActivity {
         mAddImageButton = findViewById(R.id.add_image_view);
         mSubmitButton = findViewById(R.id.save_note);
 
-        mTitleText.setText(mNote.getTitle());
-        mBodyText.setText(mNote.getBody());
 
-        List<String> images = mNote.getImages();
-        for (int i = 0; i < images.size(); ++i) {
-            final String image = images.get(i);
-            final LinearLayout l = new LinearLayout(this);
-            ImageView v = new ImageView(this);
-            l.addView(v);
-            mImagesLayout.addView(l, i);
-            int pix = SizeUtils.dpToPx(this, 100);
 
-            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(pix, pix);
-            p.setMargins(0, 0, 20, 0);
-            l.setLayoutParams(p);
-            new ImageLoader(v).execute(image);
+        if(!create){
 
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View view) {
-                    AlertDialog.Builder builder1 = new AlertDialog.Builder(EditTextNoteActivity.this);
-                    builder1.setMessage("Are you sure you want to delete this image?");
-                    builder1.setCancelable(true);
-                    builder1.setPositiveButton(
-                            "Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    mImagesLayout.removeView(l);
-                                    mNote.getImages().remove(image);
-                                    dialog.cancel();
-                                }
-                            });
-                    builder1.setNegativeButton("No", null);
+            mTitleText.setText(mNote.getTitle());
+            mBodyText.setText(mNote.getBody());
 
-                    AlertDialog alert11 = builder1.create();
-                    alert11.show();
-                }
-            });
+            List<String> images = mNote.getImages();
+            for (int i = 0; i < images.size(); ++i) {
+                final String image = images.get(i);
+                final LinearLayout l = new LinearLayout(this);
+                ImageView v = new ImageView(this);
+                l.addView(v);
+                mImagesLayout.addView(l, i);
+                int pix = SizeUtils.dpToPx(this, 100);
+
+                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(pix, pix);
+                p.setMargins(0, 0, 20, 0);
+                l.setLayoutParams(p);
+                new ImageLoader(v).execute(image);
+
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View view) {
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(EditTextNoteActivity.this);
+                        builder1.setMessage("Are you sure you want to delete this image?");
+                        builder1.setCancelable(true);
+                        builder1.setPositiveButton(
+                                "Yes",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        mImagesLayout.removeView(l);
+                                        mNote.getImages().remove(image);
+                                        dialog.cancel();
+                                    }
+                                });
+                        builder1.setNegativeButton("No", null);
+
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
+                    }
+                });
+            }
         }
+
+
+
 
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO submit note
-                DialogHelper.showOkDialog(EditTextNoteActivity.this, "Done");
+                submit();
+                //DialogHelper.showOkDialog(EditTextNoteActivity.this, "Done");
             }
         });
 
@@ -137,6 +162,47 @@ public class EditTextNoteActivity extends AppCompatActivity {
                 addImage();
             }
         });
+    }
+
+    private void submit() {
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setTitle("Choose tag for new note");
+
+        OwnedNoteTags ownedTagsObj = OwnedNoteTags.getOwnedTags();
+        HashMap<String, String> ownedTags = ownedTagsObj.getOwned();
+        List<String> tagsInt = new ArrayList<>();
+
+        Iterator it = ownedTags.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            tagsInt.add((String) pair.getKey());
+        }
+        final String[] tags = tagsInt.toArray(new String[0]);
+        b.setItems(tags, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if(mNote == null){
+                    mNote = new TextNote(tags[which], mTitleText.getText().toString(), mBodyText.getText().toString(), new ArrayList<String>());
+                    mNote.setOwner(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""), tags[which]);
+                    mNote.setSharedUsers(new HashMap<String, String>());
+                    mNote.setLabels(new ArrayList<String>());
+                    BackendConnector.createTextNote(EditTextNoteActivity.this, mNote);
+
+                }else{
+                    BackendConnector.uploadTextNote(EditTextNoteActivity.this, mNote);
+                }
+
+
+
+                dialog.dismiss();
+
+            }
+
+        });
+
+        b.show();
     }
 
     private void addImage() {

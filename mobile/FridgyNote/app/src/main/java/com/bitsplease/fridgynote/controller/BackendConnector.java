@@ -122,6 +122,41 @@ public class BackendConnector {
         queue.add(stringRequest);
     }
 
+    public static void createTextNote(Context context, final TextNote note) {
+        Log.d("FN-test", "uploading note " + note.toJSON().toString());
+        RequestQueue queue = Volley.newRequestQueue(context);
+        final String url = "https://fridgynote.herokuapp.com/notes/text/";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("FN- RESPONSE", "Response is: " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
+            }
+        }) {
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap();
+                headers.put("Authorization", PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, "moura"));
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                Log.e("FN-ERROR", "Sending " + note.toJSON().toString());
+                return note.toJSON().toString().getBytes();
+            }
+        };
+
+        queue.add(stringRequest);
+    }
+
     public static void uploadBitmap(Context context, final Bitmap bitmap, final ImageUploadCallback callback) {
         Log.d("FN-test", "uploading bitmap");
         RequestQueue queue = Volley.newRequestQueue(context);
