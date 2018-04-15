@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/icon_note"
+        android:layout_width="150px"
+        android:layout_height="150px"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="4px"
+        android:longClickable="true"
+        android:src="@drawable/note_icon"
+        app:srcCompat="@android:color/darker_gray"></ImageView>
+
+    <TextView
+        android:id="@+id/label_note"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="15dp"
+        android:textSize="50px"></TextView>
+
+
+</LinearLayout>
