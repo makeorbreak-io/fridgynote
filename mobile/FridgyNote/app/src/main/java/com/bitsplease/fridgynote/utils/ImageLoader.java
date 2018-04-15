@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -42,10 +43,15 @@ public class ImageLoader extends AsyncTask<String, Void, Bitmap> {
      * @return result byte array
      */
     public static byte[] convertBitmapToByteArrayUncompressed(Bitmap bitmap){
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
-        bitmap.copyPixelsToBuffer(byteBuffer);
-        byteBuffer.rewind();
-        return byteBuffer.array();
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
+//        bitmap.copyPixelsToBuffer(byteBuffer);
+//        byteBuffer.rewind();
+//        return byteBuffer.array();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        bitmap.recycle();
+        return byteArray;
     }
 
     /**

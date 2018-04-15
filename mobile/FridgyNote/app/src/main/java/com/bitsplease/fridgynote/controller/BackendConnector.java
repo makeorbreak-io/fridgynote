@@ -139,12 +139,15 @@ public class BackendConnector {
             public void onErrorResponse(VolleyError error) {
                 Log.e("FN-ERROR", "That didn't work! " + url);
                 Log.e("FN-ERROR", "That didn't work! " + error.toString());
+                Log.e("FN-ERROR", "That didn't work! " + error.getMessage());
+                Log.e("FN-ERROR", "That didn't work! " + error.getLocalizedMessage());
+                Log.e("FN-ERROR", "That didn't work! " + error.getCause());
             }
         }) {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap();
                 headers.put("Authorization", PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, "moura"));
-                headers.put("Content-Type", "image/png");
+                headers.put("Content-Type", "application/octet-stream");
                 return headers;
             }
 

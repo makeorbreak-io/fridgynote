@@ -65,8 +65,7 @@ public class TextNote extends Note {
         JSONArray imagesList = textNote.getJSONArray("images");
         if(imagesList.length() > 0){
             for(int i = 0; i <imagesList.length(); i++){
-                JSONObject image = imagesList.getJSONObject(i);
-                mImages.add(image.getString("path"));
+                mImages.add(imagesList.getString(i));
             }
         }
 
@@ -116,9 +115,7 @@ public class TextNote extends Note {
             }
 
             for(String s : mImages) {
-                JSONObject i = new JSONObject();
-                i.put("path", s);
-                obj.accumulate("images", i);
+                obj.accumulate("images", s);
             }
         } catch (JSONException e) {
             e.printStackTrace();
