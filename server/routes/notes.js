@@ -4,10 +4,9 @@ const db = require('../database/db')
 const bodyParser = require('body-parser');
 const { check, validationResult, oneOf } = require('express-validator/check');
 const fs = require('fs');
-const WebSocket = require('ws');
+var cors = require('cors')
 
-const wss = new WebSocket.Server({ port: 3001 });
-
+let temp_files = []
 
 router.post('/send/:textId',check('Authorization').exists(),function(req,res){
     const errors = validationResult(req);
@@ -18,18 +17,15 @@ router.post('/send/:textId',check('Authorization').exists(),function(req,res){
 
     db.findTextNotebyId(req.params.textId)
         .then((textNote)=>{
-            console.log(textNote);
-            wss.on('connection', function connection(ws) {
-                console.log('Connect Client')
-                ws.send(JSON.stringify(textNote));
-                console.log('Message sent')
-                wss.close()
-                res.status(200).end()
-              });
+            temp_files.push({title:textNote.title,body:textNote.body});
+            res.status(200).end();
         })
-
-    
 })
+
+router.get('/receive',cors(),function(req,res){
+    const temp = temp_files.pop() || null;
+    res.json(temp);
+});
 
 router.get('/me', check('Authorization').exists(), function (req, res) {
     const errors = validationResult(req);
@@ -219,6 +215,3 @@ router.delete('/text/:id', [check('Authorization').exists()], function (req, res
 
 
 module.exports = router;
-
-
-// oneOf([check('title').exists(), check('items').exists(), check('shared').exists()])

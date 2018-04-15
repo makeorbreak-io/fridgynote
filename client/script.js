@@ -1,23 +1,27 @@
 document.addEventListener("DOMContentLoaded", function(event) {
-    function start(websocketServerLocation) {
-        ws = new WebSocket(websocketServerLocation);
-        ws.onopen = function() {
-            console.log('socket open');
+    function makeRequest() {
+        setTimeout(function() {
+            request();
+        }, 1000);
+    }
+
+    function request() {
+        fetch('http://localhost:3000/notes/receive', {
+            mode: 'cors'
+        }).then((note)=>{
+            return note.json();
         }
-        ;
-        ws.onmessage = function(evt) {
-            const textNote = JSON.parse(evt.data);
-            console.log(textNote);
-            fillData(textNote.title,textNote.body)
+        ).then((noteData)=>{
+            if (noteData) {
+                fillData(noteData.title, noteData.body)
+            }
+            makeRequest();
         }
-        ;
-        ws.onclose = function() {
-            // Try to reconnect in 5 seconds
-            setTimeout(function() {
-                start(websocketServerLocation)
-            }, 1000);
+        ).catch((err)=>{
+            console.log(err)
+            alert(err);
         }
-        ;
+        )
     }
 
     function fillData(title, body) {
@@ -27,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         document.querySelector("#body").innerHTML = body;
     }
 
-    //start('ws://localhost:3000')
-    start('ws://fridgynote.herokuapp.com/')
+    makeRequest();
 
 });
