@@ -30,10 +30,6 @@ public class ShoppingItemsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.shopping_item_fragment_layout,
                 container, false);
-        //TODO remover isto
-        shoppingItems.addShoppingItem("fridgynote1","Cebola","test");
-
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_shop_list);
 
         // use this setting to improve performance if you know that changes

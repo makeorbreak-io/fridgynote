@@ -51,11 +51,11 @@ public class TagNotesActivity extends AppCompatActivity {
             @Override
             public void tagNotesCallback(List<Note> response) {
                 List<Note> toRemove = new ArrayList<>();
-                for (Note n:response) {
-                    if(!n.getTagId().equals(noteId)){
+                for (Note n : response) {
+                    if (!n.getTagId().equals(noteId)) {
                         //response.remove(n);
                         toRemove.add(n);
-                    }else if(noteId.equals("unassigned") && n.getTagId() != null){
+                    } else if (noteId.equals("unassigned") && n.getTagId() != null) {
                         //response.remove(n);
                         toRemove.add(n);
                     }
@@ -67,27 +67,39 @@ public class TagNotesActivity extends AppCompatActivity {
 
     }
 
-    public void createNoteList(final List<Note> notes){
-        for(int i = 0; i< notes.size();i++){
+    public void createNoteList(final List<Note> notes) {
+        for (int i = 0; i < notes.size(); i++) {
             String title = "";
+            final boolean isTextNote;
+
             int id = getResources().getIdentifier("card" + (i + 1), "id", this.getPackageName());
             CardView cardView= findViewById(id);
             //registerForContextMenu(cardView);
             cardView.setLongClickable(true);
 
-            if(notes.get(i) instanceof TextNote){
-                title=((TextNote) notes.get(i)).getTitle();
-            }else if(notes.get(i) instanceof ListNote){
+            if (notes.get(i) instanceof TextNote) {
+                title = ((TextNote) notes.get(i)).getTitle();
+                isTextNote = true;
+            } else if (notes.get(i) instanceof ListNote) {
                 title = ((ListNote) notes.get(i)).getName();
+                isTextNote = false;
+            } else {
+                isTextNote = true;
             }
-            ((TextView) ((LinearLayout)cardView.getChildAt(0)).getChildAt(0)).setText(title);
+
+            ((TextView) ((LinearLayout) cardView.getChildAt(0)).getChildAt(0)).setText(title);
             cardView.setVisibility(View.VISIBLE);
             final String noteId = notes.get(i).getId();
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(TagNotesActivity.this, TextNoteActivity.class);
-                    intent.putExtra(Constants.EXTRA_NOTEID,noteId);
+                    Intent intent;
+                    if (isTextNote) {
+                        intent = new Intent(TagNotesActivity.this, TextNoteActivity.class);
+                    } else {
+                        intent = new Intent(TagNotesActivity.this, ListNote.class);
+                    }
+                    intent.putExtra(Constants.EXTRA_NOTEID, noteId);
                     startActivity(intent);
                 }
             });
@@ -129,28 +141,7 @@ public class TagNotesActivity extends AppCompatActivity {
             }
         }
     };
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId()==R.id.notes_groups) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.tag_context_menu, menu);
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch(item.getItemId()) {
-            case R.id.delete:
-
-
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
+    
 
 
 }

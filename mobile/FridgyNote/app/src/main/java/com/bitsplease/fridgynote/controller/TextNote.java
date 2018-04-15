@@ -26,7 +26,7 @@ public class TextNote extends Note {
         mTitle = title;
         mBody = body;
         mImages = images;
-
+        mLabels = new ArrayList<>();
     }
 
     public TextNote(JSONObject textNote) throws JSONException {
@@ -64,6 +64,7 @@ public class TextNote extends Note {
         mTitle = textNote.getString("title");
         mBody = textNote.getString("body");
         mImages = new ArrayList<>();
+        mLabels = new ArrayList<>();
         JSONArray imagesList = textNote.getJSONArray("images");
         if(imagesList.length() > 0){
             for(int i = 0; i <imagesList.length(); i++){

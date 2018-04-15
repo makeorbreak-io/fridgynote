@@ -197,8 +197,9 @@ public class BackendConnector {
     }
 
     public static void updateListNote(Context context, final ListNote note) {
+        Log.d("FN-test", note.toJSON().toString());
         RequestQueue queue = Volley.newRequestQueue(context);
-        final String url = "https://fridgynote.herokuapp.com/notes/list" ;
+        final String url = "https://fridgynote.herokuapp.com/notes/list/" + note.getId();
 
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url,
                 new Response.Listener<String>() {

@@ -53,14 +53,10 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         view = inflater.inflate(R.layout.notes_group_fragment_layout,
                 container, false);
 
-
         rv = view.findViewById(R.id.notes_groups);
-
-
         BackendConnector.getNoteTags(getActivity(), this);
         return view;
     }
@@ -163,11 +159,8 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
                                     int position, long arg3) {
 
                 TextView tv = v.findViewById(R.id.label_note);
-
                 Iterator it = idMap.entrySet().iterator();
-
                 String value = (String) tv.getText();
-
                 String tagId = "unassigned";
 
                 while(it.hasNext()){
@@ -177,12 +170,9 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
                     }
                 }
 
-
-
                 Intent intent = new Intent(getActivity(), TagNotesActivity.class);
                 intent.putExtra("tag", tagId);
                 startActivity(intent);
-
             }
         });
 

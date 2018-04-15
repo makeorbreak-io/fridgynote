@@ -208,6 +208,15 @@
                 </android.support.constraint.ConstraintLayout>
             </LinearLayout>
 
+            <Spinner
+                android:id="@+id/label_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="visible"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="243dp" />
+
         </LinearLayout>
 
     </ScrollView>

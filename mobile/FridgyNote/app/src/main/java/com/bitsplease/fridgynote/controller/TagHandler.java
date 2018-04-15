@@ -43,9 +43,11 @@ public class TagHandler {
                 BackendConnector.getNoteTags(context, new BackEndCallback() {
                     @Override
                     public void tagNotesCallback(List<Note> response) {
+                        Log.d(TAG, "notes " + response.size());
                         for(Note n : response) {
                             Log.d(TAG, "checking " + noteName + " " +  n.getId());
                             if(n.getId().equals(noteName.second)) {
+                                Log.d(TAG, "match");
                                 ListNote note = (ListNote) n;
                                 note.addItem(noteName.first);
                                 BackendConnector.updateListNote(context, note);

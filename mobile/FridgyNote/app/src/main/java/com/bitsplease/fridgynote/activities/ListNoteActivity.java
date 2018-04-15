@@ -2,6 +2,7 @@ package com.bitsplease.fridgynote.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bitsplease.fridgynote.R;
@@ -43,6 +45,7 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
     private LinearLayout mItemsLayout;
     private View mAddItem;
     private Button mShareButton;
+    private Spinner mLabelSpinner;
 
     private ListNote mNote;
     private String mNoteId;
@@ -63,7 +66,7 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.sync_menu, menu);
+        inflater.inflate(R.menu.note_menu, menu);
         return true;
     }
 
@@ -72,6 +75,12 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
+                BackendConnector.getNoteTags(this, this);
+                return true;
+            case R.id.menu_edit:
+                Intent intent = new Intent(this, EditListNoteActivity.class);
+                intent.putExtra(Constants.EXTRA_NOTEID, mNoteId);
+                startActivity(intent);
                 BackendConnector.getNoteTags(this, this);
                 return true;
             default:
@@ -85,6 +94,7 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
         mItemsLayout = findViewById(R.id.list_note_items_layout);
         mAddItem = findViewById(R.id.add_item);
         mShareButton = findViewById(R.id.share_button);
+        mLabelSpinner = findViewById(R.id.label_spinner);
 
         while (mItemsLayout.getChildCount() > 1) {
             mItemsLayout.removeViewAt(0);
@@ -170,6 +180,19 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
                 builder.show();
             }
         });
+
+        final String[] select_qualification = { "Labels", "Sports", "School", "Fun", "Work", "Family", "Chores"};
+
+        ArrayList<TextNoteActivity.StateVO> listVOs = new ArrayList<>();
+
+        for (int i = 0; i < select_qualification.length; i++) {
+            TextNoteActivity.StateVO stateVO = new TextNoteActivity.StateVO();
+            stateVO.setTitle(select_qualification[i]);
+            stateVO.setSelected(false);
+            listVOs.add(stateVO);
+        }
+        TextNoteActivity.MyAdapter myAdapter = new TextNoteActivity.MyAdapter(ListNoteActivity.this, 0, listVOs);
+        mLabelSpinner.setAdapter(myAdapter);
     }
 
     private int getUserSharedId(int index) {
