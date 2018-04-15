@@ -28,7 +28,7 @@ public class Reminders {
 
     private Map<String, String> reminders;
 
-    private Reminders() {
+    public Reminders() {
         reminders = new HashMap<>();
 
         SharedPreferences preferences = PreferenceUtils.getPrefs();
@@ -99,6 +99,10 @@ public class Reminders {
         updatePreferences();
     }
 
+    public Set<String> getKeyset(){
+        return this.reminders.keySet();
+    }
+
     public boolean hasReminder(String tag) {
         return reminders.containsKey(tag);
     }
@@ -162,5 +166,9 @@ public class Reminders {
             builder.append("#");
         }
         return builder.toString();
+    }
+
+    public int length(){
+        return reminders.size();
     }
 }

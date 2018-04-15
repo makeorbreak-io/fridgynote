@@ -52,7 +52,7 @@ public class ShoppingItemAdaptor extends RecyclerView.Adapter<ShoppingItemAdapto
         TextView item = holder.itemView.findViewById(R.id.item);
 
         String key = mKeys[position];
-        String value = shoppingItems.getShoppingItem(key).toString();
+        String value = shoppingItems.getShoppingItem(key).first.toString();
 
         item.setText(value);
     }
