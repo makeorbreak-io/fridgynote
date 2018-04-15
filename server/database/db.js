@@ -25,7 +25,7 @@ const listNoteItemSchema = new Schema({
 const textNoteSchema = new Schema({
     title: String,
     body: String,
-    images: [ String ],
+    images: [String],
     owner: userTagSchema,
     shared: [userTagSchema],
     labels: []
@@ -140,7 +140,7 @@ function createNewListNote(title, items, ownerId, tagId, shared) {
 }
 
 function editListNote(listNoteId, title, items, shared) {
-    console.log(listNoteId,title)
+    console.log(listNoteId, title)
     return ListNote.findById({ _id: listNoteId })
         .then((listNote) => {
             if (title) listNote.title = title;
@@ -212,17 +212,21 @@ function getNoteByUser(userId) {
 };
 
 function updateTextNote(id, title, body, images, owner, shared, labels) {
-    
-    return TextNote.findById({ _id: id })
-    .then((textNote) => {
-        if (title) textNote.title = title;
-        if (body) textNote.body = body;
-        if (images) textNote.images = images;
-        if (shared) textNote.shared = shared;
-        if (labels) textNote.labels = labels;
-        return textNote.save();
-    })
 
+    return TextNote.findById({ _id: id })
+        .then((textNote) => {
+            if (title) textNote.title = title;
+            if (body) textNote.body = body;
+            if (images) textNote.images = images;
+            if (shared) textNote.shared = shared;
+            if (labels) textNote.labels = labels;
+            return textNote.save();
+        })
+
+}
+
+function findTextNotebyId(id) {
+    return TextNote.findOne({ _id: id });
 }
 
 
@@ -238,6 +242,7 @@ module.exports = {
     editListNote,
     deleteTextNote,
     deleteListItem,
-    deleteListNote
+    deleteListNote,
+    findTextNotebyId
 }
 

@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json())
 
 db.connect();
-db.populate();
+//db.populate();
 
 app.use('/notes', notesRouter);
 

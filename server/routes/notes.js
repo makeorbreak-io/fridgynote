@@ -4,9 +4,34 @@ const db = require('../database/db')
 const bodyParser = require('body-parser');
 const { check, validationResult, oneOf } = require('express-validator/check');
 const fs = require('fs');
+const WebSocket = require('ws');
 
 
 
+
+
+router.post('/send/:textId',check('Authorization').exists(),function(req,res){
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.mapped() });
+    }
+
+    db.findTextNotebyId(req.params.textId)
+        .then((textNote)=>{
+            console.log(textNote);
+            const wss = new WebSocket.Server({ port: 3001 });
+            wss.on('connection', function connection(ws) {
+                console.log('Connect Client')
+                ws.send(JSON.stringify(textNote));
+                console.log('Message sent')
+                wss.close()
+                res.status(200).end()
+              });
+        })
+
+    
+})
 
 router.get('/me', check('Authorization').exists(), function (req, res) {
     const errors = validationResult(req);
@@ -85,8 +110,8 @@ router.post('/text/image',bodyParser.raw({limit: '50mb'}), function (req, res, n
         res.send('https://fridgynote.herokuapp.com/' + imgpath);
     });
 
-
 });
+
 
 router.post('/text', [oneOf([check('title').exists(), check('body').exists(), check('labels').exists(), check('images').exists()]), check('Authorization').exists()], function (req, res, next) {
     const errors = validationResult(req);
