@@ -1,10 +1,13 @@
 package com.bitsplease.fridgynote.adaptors;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.Reminders;
@@ -19,6 +22,7 @@ public class ReminderAdaptor extends RecyclerView.Adapter<ReminderAdaptor.ViewHo
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        private String tag;
         public ViewHolder(View itemView) {
             super(itemView);
         }
@@ -47,15 +51,25 @@ public class ReminderAdaptor extends RecyclerView.Adapter<ReminderAdaptor.ViewHo
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         TextView item = holder.itemView.findViewById(R.id.item);
 
-        String key = mKeys[position];
-        String value = reminders.getReminder(key);
-
+        final String key = mKeys[position];
+        final String value = reminders.getReminder(key);
         item.setText(value);
+
+        Button deleteButton = holder.itemView.findViewById(R.id.delete_button);
+
+        deleteButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                reminders.deleteReminder(key);
+                notifyItemRemoved(position);
+            }
+        });
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.bitsplease.fridgynote.R;
@@ -46,13 +47,23 @@ public class ShoppingItemAdaptor extends RecyclerView.Adapter<ShoppingItemAdapto
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         TextView item = holder.itemView.findViewById(R.id.item);
 
-        String key = mKeys[position];
+        final String key = mKeys[position];
         String value = shoppingItems.getShoppingItem(key).first.toString();
+
+        Button deleteButton = holder.itemView.findViewById(R.id.delete_button);
+
+        deleteButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                shoppingItems.deleteShoppingItem(key);
+                notifyItemRemoved(position);
+            }
+        });
 
         item.setText(value);
     }
