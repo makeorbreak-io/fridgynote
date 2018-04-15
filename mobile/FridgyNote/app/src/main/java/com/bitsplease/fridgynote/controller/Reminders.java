@@ -63,7 +63,7 @@ public class Reminders {
         deleteReminder(tag, true);
     }
 
-    private void deleteReminder(String tag, boolean updatePrefs) {
+    public void deleteReminder(String tag, boolean updatePrefs) {
         if (reminders.containsKey(tag)) {
             reminders.remove(tag);
         }

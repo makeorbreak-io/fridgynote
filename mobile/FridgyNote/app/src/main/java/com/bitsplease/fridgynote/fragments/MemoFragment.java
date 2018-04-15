@@ -3,6 +3,7 @@ package com.bitsplease.fridgynote.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,7 +33,6 @@ public class MemoFragment extends Fragment {
         View view = inflater.inflate(R.layout.memo_fragment_layout,
                 container, false);
         reminders.addReminder("Teste","Lembrete");
-
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_reminder_list);
 
         // use this setting to improve performance if you know that changes
@@ -46,6 +46,7 @@ public class MemoFragment extends Fragment {
         // specify an adapter (see also next example)
         mAdapter = new ReminderAdaptor(reminders);
         mRecyclerView.setAdapter(mAdapter);
+
         return view;
 
     }
