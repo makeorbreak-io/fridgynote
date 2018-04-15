@@ -166,7 +166,7 @@ public class EditTextNoteActivity extends AppCompatActivity {
     }
 
     private void submit() {
-        if(mNote.getTagId() == null || mNote.getTagId().isEmpty()) {
+        if(mNote == null || mNote.getTagId() == null || mNote.getTagId().isEmpty()) {
             AlertDialog.Builder b = new AlertDialog.Builder(this);
             b.setTitle("Choose tag for new note");
 
