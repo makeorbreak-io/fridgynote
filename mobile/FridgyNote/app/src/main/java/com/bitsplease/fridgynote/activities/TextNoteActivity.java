@@ -8,13 +8,16 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -45,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class TextNoteActivity extends AppCompatActivity implements ImageUploadCallback, BackEndCallback {
     private static final String TAG = "FN-TextNoteAct";
@@ -125,10 +129,10 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
 
         Map<String, String> users = mNote.getAllUsersExcept(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""));
         final List<String> keys = new ArrayList<>(users.keySet());
-        for(int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 5; ++i) {
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.GONE);
         }
-        for(int i = 0; i < keys.size(); ++i) {
+        for (int i = 0; i < keys.size(); ++i) {
             TextView v = findViewById(getUserSharedId(i));
             View parent = findViewById(getViewParent(getUserSharedId(i)));
             parent.setVisibility(View.VISIBLE);
@@ -168,6 +172,35 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
                     }
                 });
                 builder.show();
+            }
+        });
+
+        findViewById(R.id.text_note_container).setOnTouchListener(new View.OnTouchListener() {
+            private float prevY = -1;
+            private long sentTimestamp = -1;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        if (prevY == -1) {
+                            prevY = event.getY();
+                        } else {
+                            if (prevY > event.getY()) {
+                                long currentMilis = System.currentTimeMillis();
+                                if(sentTimestamp == -1 || currentMilis - sentTimestamp >= TimeUnit.SECONDS.toMillis(5)) {
+                                    Log.d("FN-test", "SENDING");
+                                    BackendConnector.sendTextNoteToWebApp(TextNoteActivity.this, mNote);
+                                    sentTimestamp = currentMilis;
+                                    Snackbar mySnackbar = Snackbar.make(findViewById(R.id.text_note_container), "Note sent to web app.", Snackbar.LENGTH_LONG);
+                                    mySnackbar.show();
+                                }
+                            }
+                            prevY = event.getY();
+                        }
+                        return true;
+                }
+                return false;
             }
         });
 
@@ -295,13 +328,13 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
 
     @Override
     public void tagNotesCallback(List<Note> response) {
-        for(Note n : response) {
-            if(!(n instanceof TextNote)) {
+        for (Note n : response) {
+            if (!(n instanceof TextNote)) {
                 continue;
             }
             TextNote note = (TextNote) n;
             mNote = note;
-            if(note.getId().equals(mNoteId)) {
+            if (note.getId().equals(mNoteId)) {
                 break;
             }
         }

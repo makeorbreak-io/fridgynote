@@ -298,4 +298,39 @@ public class BackendConnector {
 
         return map;
     }
+
+    public static void sendTextNoteToWebApp(Context context, final TextNote note) {
+        Log.d("FN-test", "uploading web note " + note.toJSON().toString());
+        RequestQueue queue = Volley.newRequestQueue(context);
+        final String url = "https://fridgynote.herokuapp.com/notes/send/" + note.getId();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("FN- RESPONSE", "Response is: " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
+            }
+        }) {
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap();
+                headers.put("Authorization", PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, "moura"));
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                Log.e("FN-ERROR", "Sending web " + note.toJSON().toString());
+                return note.toJSON().toString().getBytes();
+            }
+        };
+
+        queue.add(stringRequest);
+    }
 }
