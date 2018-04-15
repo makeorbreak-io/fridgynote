@@ -69,7 +69,7 @@ public class TagNotesActivity extends AppCompatActivity {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(TagNotesActivity.this, TextNote.class);
+                    Intent intent = new Intent(TagNotesActivity.this, TextNoteActivity.class);
                     intent.putExtra(Constants.EXTRA_NOTEID,noteId);
                     startActivity(intent);
                 }
