@@ -18,7 +18,10 @@ import android.widget.Toast;
 
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
+import com.bitsplease.fridgynote.controller.ListNote;
+import com.bitsplease.fridgynote.controller.Note;
 import com.bitsplease.fridgynote.controller.TextNote;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.ImageLoader;
@@ -49,12 +52,28 @@ public class EditTextNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_text_note);
 
         // TODO if noteId is empty this can be used to create note
-        Bundle b = getIntent().getExtras();
-        String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getTextNote(noteId);
-
         newCustomBitmaps = new ArrayList<>();
-        setupUi();
+        Bundle b = getIntent().getExtras();
+        final String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        BackendConnector.getNoteTags(this, new BackEndCallback() {
+            @Override
+            public void tagNotesCallback(List<Note> response) {
+                for(Note n : response) {
+                    if(n.getId().equals(noteId)) {
+                        mNote = (TextNote) n;
+                        break;
+                    }
+                }
+                if(mNote != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setupUi();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void setupUi() {

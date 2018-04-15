@@ -18,6 +18,8 @@ import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
+import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 
 import java.util.List;
@@ -38,10 +40,26 @@ public class EditListNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_list_note);
 
         Bundle b = getIntent().getExtras();
-        String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        mNote = BackendConnector.getListNote(noteId);
-
-        setupUi();
+        final String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
+        BackendConnector.getNoteTags(this, new BackEndCallback() {
+            @Override
+            public void tagNotesCallback(List<Note> response) {
+                for (Note n : response) {
+                    if (n.getId().equals(noteId)) {
+                        mNote = (ListNote) n;
+                        break;
+                    }
+                }
+                if (mNote != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setupUi();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void setupUi() {
@@ -113,7 +131,7 @@ public class EditListNoteActivity extends AppCompatActivity {
     }
 
     private void addItem(String itemName) {
-        if(itemName == null || itemName.length() == 0) {
+        if (itemName == null || itemName.length() == 0) {
             return;
         }
 

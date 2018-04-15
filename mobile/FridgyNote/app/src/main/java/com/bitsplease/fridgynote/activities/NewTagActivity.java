@@ -17,7 +17,9 @@ import android.widget.Toast;
 import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
+import com.bitsplease.fridgynote.controller.Note;
 import com.bitsplease.fridgynote.controller.TagHandler;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.NfcWrapper;
@@ -135,17 +137,27 @@ public class NewTagActivity extends AppCompatActivity {
                 selectListText.setVisibility(View.GONE);
             }
         });
+        final List<String> list = new ArrayList<>();
+        BackendConnector.getNoteTags(this, new BackEndCallback() {
+            @Override
+            public void tagNotesCallback(List<Note> response) {
+                listNotes = new ArrayList<>();
+                for(Note n : response) {
+                    if(n instanceof ListNote) {
+                        listNotes.add((ListNote) n);
+                    }
+                }
 
-        List<String> list = new ArrayList<>();
-        listNotes = BackendConnector.getListNotes();
-        for (ListNote note : listNotes) {
-            list.add(note.getName());
-        }
+                for (ListNote note : listNotes) {
+                    list.add(note.getName());
+                }
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(NewTagActivity.this,
+                        android.R.layout.simple_spinner_item, list);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                selectListSpinner.setAdapter(dataAdapter);
+            }
+        });
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, list);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        selectListSpinner.setAdapter(dataAdapter);
     }
 
     @Override

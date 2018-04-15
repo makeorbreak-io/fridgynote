@@ -13,12 +13,15 @@ import com.bitsplease.fridgynote.activities.ListNoteActivity;
 import com.bitsplease.fridgynote.activities.NewTagActivity;
 import com.bitsplease.fridgynote.activities.TagNotesActivity;
 import com.bitsplease.fridgynote.activities.TextNoteActivity;
+import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
+
+import java.util.List;
 
 public class TagHandler {
     private static final String TAG = "FN-TagHandler";
 
-    public static boolean handleTag(Context context, String tagId) {
+    public static boolean handleTag(final Context context, String tagId) {
         Log.d(TAG, "Handling tag " + tagId);
         if (tagId == null || tagId.isEmpty()) {
             return false;
@@ -36,14 +39,20 @@ public class TagHandler {
             ShoppingItems s = ShoppingItems.getShoppingItems();
             if(s.hasShoppingItem(tagId)) {
                 Log.d(TAG, "Shopping Item");
-                Pair<String,String> noteName = s.getShoppingItem(tagId);
-                ListNote note = BackendConnector.getListNote(noteName.second);
-                if(note == null) {
-                    Toast.makeText(context, "Unable to add shopping item.", Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-                note.addItem(noteName.first);
-                BackendConnector.updateListNote(context, note);
+                final Pair<String,String> noteName = s.getShoppingItem(tagId);
+                BackendConnector.getNoteTags(context, new BackEndCallback() {
+                    @Override
+                    public void tagNotesCallback(List<Note> response) {
+                        for(Note n : response) {
+                            Log.d(TAG, "checking " + noteName + " " +  n.getId());
+                            if(n.getId().equals(noteName.second)) {
+                                ListNote note = (ListNote) n;
+                                note.addItem(noteName.first);
+                                BackendConnector.updateListNote(context, note);
+                            }
+                        }
+                    }
+                });
                 return true;
             }
 

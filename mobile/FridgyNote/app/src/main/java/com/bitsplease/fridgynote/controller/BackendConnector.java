@@ -193,64 +193,6 @@ public class BackendConnector {
         queue.add(stringRequest);
     }
 
-    public static TextNote getTextNote(String noteId) {
-        List<String> images = new ArrayList<>();
-        images.add("https://pbs.twimg.com/profile_images/949374088249671680/MuxDEZpD_400x400.jpg");
-        images.add("https://upload.wikimedia.org/wikipedia/commons/0/0f/Eiffel_Tower_Vertical.JPG");
-        images.add("https://ironcodestudio.com/wp-content/uploads/2015/03/css-remove-horizontal-scrollbar.jpg");
-
-        TextNote res = new TextNote(noteId, "Notinha", "Cenas cenas cenas", images);
-        res.setOwner("lago", "tag");
-        Map<String, String> shared = new HashMap<>();
-        shared.put("tostos", "tag2");
-        res.setSharedUsers(shared);
-        return res;
-    }
-
-    public static ListNote getListNote(String noteId) {
-        List<ListNoteItem> items = new ArrayList<>();
-        items.add(new ListNoteItem("Bananas", false));
-        items.add(new ListNoteItem("Chocapitos", false));
-        items.add(new ListNoteItem("Tags NFC", true));
-        items.add(new ListNoteItem("Memes", false));
-        items.add(new ListNoteItem("BigMac", true));
-
-        ListNote res = new ListNote(noteId, "Comprinhas", items);
-        res.setOwner("lago", "tag");
-        Map<String, String> shared = new HashMap<>();
-        shared.put("tostos", "tag2");
-        res.setSharedUsers(shared);
-        return res;
-    }
-
-    public static List<Note> getNotes() {
-        // TODO tostas
-        return new ArrayList<>();
-    }
-
-    public static List<NoteTag> getNoteTags() {
-        List<NoteTag> res = new ArrayList<>();
-        res.add(new NoteTag("fridgynote1", "room"));
-        res.add(new NoteTag("fridgynote2", "kitchen"));
-        res.add(new NoteTag("fridgynote3", "office"));
-        return res;
-    }
-
-    public static List<ListNote> getListNotes() {
-        List<ListNote> res = new ArrayList<>();
-        res.add(new ListNote("id", "Personal Shopping", new ArrayList<ListNoteItem>()));
-        res.add(new ListNote("id", "Family Shopping", new ArrayList<ListNoteItem>()));
-        return res;
-    }
-
-    public static Reminders getReminders() {
-        return Reminders.getReminders();
-    }
-
-    public static List<Note> getUnassignedNodes() {
-        return new ArrayList<>();
-    }
-
     public static boolean createNoteTag(String tagId, String name) {
         OwnedNoteTags noteTag = OwnedNoteTags.getOwnedTags();
         if (noteTag.hasOwnedTag(tagId)) {

@@ -69,8 +69,7 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
-                mNote = BackendConnector.getListNote(mNoteId);
-                setupUi();
+                BackendConnector.getNoteTags(this, this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
