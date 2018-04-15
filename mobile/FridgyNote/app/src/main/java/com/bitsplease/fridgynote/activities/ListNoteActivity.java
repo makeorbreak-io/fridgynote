@@ -122,13 +122,21 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
         });
 
         Map<String, String> users = mNote.getAllUsersExcept(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""));
-        List<String> keys = new ArrayList<>(users.keySet());
+        final List<String> keys = new ArrayList<>(users.keySet());
         for(int i = 0; i < 5; ++i) {
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.GONE);
         }
         for(int i = 0; i < keys.size(); ++i) {
             TextView v = findViewById(getUserSharedId(i));
-            findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
+            View parent = findViewById(getViewParent(getUserSharedId(i)));
+            parent.setVisibility(View.VISIBLE);
+            final int index = i;
+            parent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogHelper.showOkDialog(ListNoteActivity.this, keys.get(index));
+                }
+            });
             v.setText("" + keys.get(i).toUpperCase().charAt(0));
         }
 

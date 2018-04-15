@@ -47,6 +47,10 @@ public class BackendConnector {
         if (s.hasShoppingItem(tagId)) {
             return true;
         }
+        OwnedNoteTags t = OwnedNoteTags.getOwnedTags();
+        if(t.hasOwnedTag(tagId)) {
+            return true;
+        }
         return false;
     }
 
@@ -86,9 +90,9 @@ public class BackendConnector {
     public static void uploadTextNote(Context context, final TextNote note) {
         Log.d("FN-test", "uploading note " + note.toJSON().toString());
         RequestQueue queue = Volley.newRequestQueue(context);
-        final String url = "https://fridgynote.herokuapp.com/notes/text";
+        final String url = "https://fridgynote.herokuapp.com/notes/text/" + note.getId();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -98,6 +102,7 @@ public class BackendConnector {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
             }
         }) {
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -109,6 +114,7 @@ public class BackendConnector {
 
             @Override
             public byte[] getBody() throws AuthFailureError {
+                Log.e("FN-ERROR", "Sending " + note.toJSON().toString());
                 return note.toJSON().toString().getBytes();
             }
         };

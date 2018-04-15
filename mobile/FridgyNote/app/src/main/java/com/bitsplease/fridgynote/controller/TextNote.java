@@ -80,6 +80,10 @@ public class TextNote extends Note {
         */
     }
 
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
     public String getTitle() {
         return mTitle;
     }

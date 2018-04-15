@@ -33,6 +33,7 @@ import com.bitsplease.fridgynote.controller.Note;
 import com.bitsplease.fridgynote.controller.TextNote;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
+import com.bitsplease.fridgynote.utils.DialogHelper;
 import com.bitsplease.fridgynote.utils.ImageLoader;
 import com.bitsplease.fridgynote.utils.ImageUploadCallback;
 import com.bitsplease.fridgynote.utils.PreferenceUtils;
@@ -82,8 +83,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sync:
-                mNote = BackendConnector.getTextNote(mNoteId);
-                setupUi();
+                BackendConnector.getNoteTags(this, this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -124,13 +124,21 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         });
 
         Map<String, String> users = mNote.getAllUsersExcept(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""));
-        List<String> keys = new ArrayList<>(users.keySet());
+        final List<String> keys = new ArrayList<>(users.keySet());
         for(int i = 0; i < 5; ++i) {
             findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.GONE);
         }
         for(int i = 0; i < keys.size(); ++i) {
             TextView v = findViewById(getUserSharedId(i));
-            findViewById(getViewParent(getUserSharedId(i))).setVisibility(View.VISIBLE);
+            View parent = findViewById(getViewParent(getUserSharedId(i)));
+            parent.setVisibility(View.VISIBLE);
+            final int index = i;
+            parent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogHelper.showOkDialog(TextNoteActivity.this, keys.get(index));
+                }
+            });
             v.setText("" + keys.get(i).toUpperCase().charAt(0));
         }
 
