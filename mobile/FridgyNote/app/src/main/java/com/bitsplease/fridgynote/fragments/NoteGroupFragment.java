@@ -97,7 +97,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
                         editor.putString(Constants.KEY_OWNED_TAGS, toString(idMap));
                         Log.e("FN-DELETE2", prefs.getString(key, " asdasd"));
                         editor.apply();
-
+                        BackendConnector.getNoteTags(getActivity(), this);
                         break;
                     }
                 }

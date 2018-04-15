@@ -18,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bitsplease.fridgynote.R;
+import com.bitsplease.fridgynote.activities.TagNotesActivity;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.ImageLoader;
@@ -365,6 +366,53 @@ public class BackendConnector {
                 return note.toJSON().toString().getBytes();
             }
         };
+
+        queue.add(stringRequest);
+    }
+
+    public static void deleteTextNote(Context context, String tagId){
+        RequestQueue queue = Volley.newRequestQueue(context);
+        final String url = "https://fridgynote.herokuapp.com/notes/text/" + tagId;
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("FN- RESPONSE", "Response is: " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
+            }
+        }){
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap();
+                headers.put("Authorization", PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, "moura"));
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }};
+
+        queue.add(stringRequest);
+    }
+
+
+    public static void deleteListNote(Context context, String tagId) {
+        RequestQueue queue = Volley.newRequestQueue(context);
+        final String url = "https://fridgynote.herokuapp.com/notes/list/" + tagId;
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("FN- RESPONSE", "Response is: " + response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("FN-ERROR", "That didn't work! " + url);
+                Log.e("FN-ERROR", "That didn't work! " + error.toString());
+            }
+        });
 
         queue.add(stringRequest);
     }

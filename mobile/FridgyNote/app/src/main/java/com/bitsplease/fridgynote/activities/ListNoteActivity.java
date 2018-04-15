@@ -24,6 +24,7 @@ import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.ListNoteItem;
 import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.controller.TextNote;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
 import com.bitsplease.fridgynote.utils.DialogHelper;
@@ -45,6 +46,8 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
 
     private ListNote mNote;
     private String mNoteId;
+
+    private ListNoteItem toDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,6 +210,17 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
         box.setChecked(item.isChecked());
         final int index = mItemsLayout.getChildCount() - 1;
 
+        box.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                toDelete = item;
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ListNoteActivity.this);
+                builder.setMessage("Are you sure you want to delete this note?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+                return true;
+            }
+        });
+
         mItemsLayout.addView(box, index);
         box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -215,6 +229,14 @@ public class ListNoteActivity extends AppCompatActivity implements BackEndCallba
             }
         });
     }
+
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mNote.getItems().remove(toDelete);
+            BackendConnector.updateListNote(ListNoteActivity.this, mNote);
+        }
+    };
 
     private void itemCheckChanged(ListNoteItem item, int index) {
         // TODO alterar valor na nota
