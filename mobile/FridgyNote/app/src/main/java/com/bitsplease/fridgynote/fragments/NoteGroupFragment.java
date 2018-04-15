@@ -7,7 +7,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,7 +46,7 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
     Map<String, String> idMap = new HashMap<>();
 
-
+    ListView rv;
     View view;
 
     @Override
@@ -54,10 +57,49 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
                 container, false);
 
 
+        rv = view.findViewById(R.id.notes_groups);
 
 
         BackendConnector.getNoteTags(getActivity(), this);
         return view;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId()==R.id.notes_groups) {
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.tag_context_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch(item.getItemId()) {
+            case R.id.delete:
+                Iterator it = idMap.entrySet().iterator();
+                TextView tv = rv.getChildAt(info.position).findViewById(R.id.label_note);
+                String value = tv.getText().toString();
+
+                SharedPreferences prefs = PreferenceUtils.getPrefs();
+                while(it.hasNext()){
+                    Map.Entry pair = (Map.Entry) it.next();
+                    Log.e("FN-DELETE", (String) pair.getValue());
+                    if(value.equals(pair.getValue())){
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.remove((String) pair.getKey());
+                        editor.apply();
+                        idMap.remove(pair.getKey());
+                        break;
+                    }
+                }
+
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
 
@@ -93,8 +135,9 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 R.layout.note_group_row, R.id.label_note, values);
-        ListView rv = view.findViewById(R.id.notes_groups);
+
         rv.setAdapter(adapter);
+        registerForContextMenu(rv);
         rv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -114,6 +157,8 @@ public class NoteGroupFragment extends Fragment implements BackEndCallback {
 
 
     }
+
+
 
 
     private Map<String, String> parseString(String str) {
