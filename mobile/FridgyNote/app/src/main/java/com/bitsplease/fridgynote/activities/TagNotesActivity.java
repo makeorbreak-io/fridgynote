@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import com.bitsplease.fridgynote.R;
 import com.bitsplease.fridgynote.controller.BackendConnector;
 import com.bitsplease.fridgynote.controller.ListNote;
 import com.bitsplease.fridgynote.controller.Note;
+import com.bitsplease.fridgynote.controller.OwnedNoteTags;
 import com.bitsplease.fridgynote.controller.TextNote;
 import com.bitsplease.fridgynote.utils.BackEndCallback;
 import com.bitsplease.fridgynote.utils.Constants;
@@ -46,6 +48,12 @@ public class TagNotesActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         final String noteId = b != null ? b.getString(Constants.EXTRA_TAGID, "") : "";
+
+        OwnedNoteTags t = OwnedNoteTags.getOwnedTags();
+        if(t.hasOwnedTag(noteId)) {
+            String title = t.getOwnedTag(noteId);
+            setTitle(title + " notes");
+        }
 
         BackendConnector.getNoteTags(this, new BackEndCallback() {
             @Override
@@ -88,6 +96,9 @@ public class TagNotesActivity extends AppCompatActivity {
             }
 
             ((TextView) ((LinearLayout) cardView.getChildAt(0)).getChildAt(0)).setText(title);
+            if(!isTextNote) {
+                ((ImageView) ((LinearLayout) cardView.getChildAt(0)).getChildAt(1)).setImageDrawable(getResources().getDrawable( R.drawable.ic_list));
+            }
             cardView.setVisibility(View.VISIBLE);
             final String noteId = notes.get(i).getId();
             cardView.setOnClickListener(new View.OnClickListener() {

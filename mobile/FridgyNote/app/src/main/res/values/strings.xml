@@ -4,9 +4,9 @@
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Notes</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_shopping_item">Shopping Item</string>
+    <string name="title_shopping_item">Shopping Items</string>
     <string name="title_reminders">Reminders</string>
     <string name="title_notifications">Notifications</string>
     <string name="tag_id">Tag ID:</string>

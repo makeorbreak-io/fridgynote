@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-
                     NoteGroupFragment notesFragment = new NoteGroupFragment();
                     fragmentTransaction.replace(android.R.id.content,  notesFragment);
                     fragmentTransaction.commit();
@@ -85,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         NoteGroupFragment notesFragment = new NoteGroupFragment();
         fragmentTransaction.replace(android.R.id.content,  notesFragment);
+
+        setTitle("FridgyNote");
 
         fragmentTransaction.commit();
 
