@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -165,44 +166,62 @@ public class EditTextNoteActivity extends AppCompatActivity {
     }
 
     private void submit() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("Choose tag for new note");
+        if(mNote.getTagId() == null || mNote.getTagId().isEmpty()) {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setTitle("Choose tag for new note");
 
-        OwnedNoteTags ownedTagsObj = OwnedNoteTags.getOwnedTags();
-        HashMap<String, String> ownedTags = ownedTagsObj.getOwned();
-        List<String> tagsInt = new ArrayList<>();
+            OwnedNoteTags ownedTagsObj = OwnedNoteTags.getOwnedTags();
+            HashMap<String, String> ownedTags = ownedTagsObj.getOwned();
+            List<String> tagsInt = new ArrayList<>();
+            List<String> tagNames = new ArrayList<>();
 
-        Iterator it = ownedTags.entrySet().iterator();
-        while(it.hasNext()){
-            Map.Entry pair = (Map.Entry)it.next();
-            tagsInt.add((String) pair.getKey());
-        }
-        final String[] tags = tagsInt.toArray(new String[0]);
-        b.setItems(tags, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                if(mNote == null){
-                    mNote = new TextNote(tags[which], mTitleText.getText().toString(), mBodyText.getText().toString(), new ArrayList<String>());
-                    mNote.setOwner(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""), tags[which]);
-                    mNote.setSharedUsers(new HashMap<String, String>());
-                    mNote.setLabels(new ArrayList<String>());
-                    BackendConnector.createTextNote(EditTextNoteActivity.this, mNote);
-
-                }else{
-                    BackendConnector.uploadTextNote(EditTextNoteActivity.this, mNote);
+            Iterator it = ownedTags.entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry pair = (Map.Entry)it.next();
+                tagsInt.add((String) pair.getKey());
+                tagNames.add((String) pair.getValue());
+            }
+            final String[] tags = tagsInt.toArray(new String[0]);
+            final String[] tagNamesArray = tagNames.toArray(new String[0]);
+            b.setItems(tagNamesArray, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    actuallySubmitChanges(tags[which], tags[which]);
+                    dialog.dismiss();
                 }
 
+            });
 
+            b.show();
+        } else {
+            actuallySubmitChanges(mNote.getId(), mNote.getTagId());
+        }
+    }
 
-                dialog.dismiss();
+    private void updateInternalNote() {
+        String ownerId = mNote.getOwner().first;
+        String ownerTagId = mNote.getOwner().second;
+        Map<String, String> shared = mNote.getSharedUsers();
+        List<String> labels = mNote.getLabels();
 
-            }
+        mNote = new TextNote(mNote.getId(), mTitleText.getText().toString(), mBodyText.getText().toString(), mNote.getImages());
+        mNote.setOwner(ownerId, ownerTagId);
+        mNote.setSharedUsers(shared);
+        mNote.setLabels(labels);
+    }
 
-        });
-
-        b.show();
+    private void actuallySubmitChanges(String id, String tagId) {
+        if(mNote == null){
+            mNote = new TextNote(id, mTitleText.getText().toString(), mBodyText.getText().toString(), new ArrayList<String>());
+            mNote.setOwner(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""), tagId);
+            mNote.setSharedUsers(new HashMap<String, String>());
+            mNote.setLabels(new ArrayList<String>());
+            BackendConnector.createTextNote(EditTextNoteActivity.this, mNote);
+        }else{
+            updateInternalNote();
+            BackendConnector.uploadTextNote(EditTextNoteActivity.this, mNote);
+        }
+        finish();
     }
 
     private void addImage() {

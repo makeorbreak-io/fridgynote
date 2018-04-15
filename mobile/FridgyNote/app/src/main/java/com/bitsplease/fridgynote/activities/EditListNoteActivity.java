@@ -51,7 +51,7 @@ public class EditListNoteActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         final String noteId = b != null ? b.getString(Constants.EXTRA_NOTEID, "") : "";
-        if(noteId.equals("")){
+        if (noteId.equals("")) {
             create = true;
             runOnUiThread(new Runnable() {
                 @Override
@@ -59,7 +59,7 @@ public class EditListNoteActivity extends AppCompatActivity {
                     setupUi();
                 }
             });
-        }else{
+        } else {
             create = false;
             BackendConnector.getNoteTags(this, new BackEndCallback() {
                 @Override
@@ -92,7 +92,7 @@ public class EditListNoteActivity extends AppCompatActivity {
         mAddItem = findViewById(R.id.add_item);
         mSubmitButton = findViewById(R.id.save_note);
 
-        if(!create){
+        if (!create) {
             mTitleText.setText(mNote.getName());
             List<ListNoteItem> items = mNote.getItems();
             for (int i = 0; i < items.size(); ++i) {
@@ -179,8 +179,8 @@ public class EditListNoteActivity extends AppCompatActivity {
         List<String> tagsInt = new ArrayList<>();
 
         Iterator it = ownedTags.entrySet().iterator();
-        while(it.hasNext()){
-            Map.Entry pair = (Map.Entry)it.next();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
             tagsInt.add((String) pair.getKey());
         }
         final String[] tags = tagsInt.toArray(new String[0]);
@@ -189,27 +189,22 @@ public class EditListNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                if(mNote == null){
+                if (mNote == null) {
                     mNote = new ListNote(tags[which], mTitleText.getText().toString(), itemsList);
                     mNote.setOwner(PreferenceUtils.getPrefs().getString(Constants.KEY_USERNAME, ""), tags[which]);
                     mNote.setSharedUsers(new HashMap<String, String>());
                     BackendConnector.createListNote(EditListNoteActivity.this, mNote);
-                }else{
+                } else {
+                    mNote.setName(mTitleText.getText().toString());
                     mNote.setItems(itemsList);
                     BackendConnector.updateListNote(EditListNoteActivity.this, mNote);
                 }
-
-
-
-
                 dialog.dismiss();
-
             }
 
         });
 
         b.show();
-
 
 
     }

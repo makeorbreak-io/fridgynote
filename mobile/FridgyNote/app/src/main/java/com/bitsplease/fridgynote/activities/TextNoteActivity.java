@@ -2,6 +2,7 @@ package com.bitsplease.fridgynote.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,13 +15,17 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -78,7 +83,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.sync_menu, menu);
+        inflater.inflate(R.menu.note_menu, menu);
         return true;
     }
 
@@ -88,6 +93,11 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         switch (item.getItemId()) {
             case R.id.menu_sync:
                 BackendConnector.getNoteTags(this, this);
+                return true;
+            case R.id.menu_edit:
+                Intent intent = new Intent(this, EditTextNoteActivity.class);
+                intent.putExtra(Constants.EXTRA_NOTEID, mNoteId);
+                startActivityForResult(intent, 0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -100,7 +110,7 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
         mImagesLayout = findViewById(R.id.note_images_layout);
         mAddImageButton = findViewById(R.id.add_image_view);
         mShareButton = findViewById(R.id.share_button);
-        //mLabelSpinner = findViewById(R.id.label_spinner);
+        mLabelSpinner = findViewById(R.id.label_spinner);
 
         mTitleText.setText(mNote.getTitle());
         mBodyText.setText(mNote.getBody());
@@ -204,7 +214,18 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
             }
         });
 
-        //mLabelSpinner.setAdapter(new ArrayAdapter<LabelViewItem>());
+        final String[] select_qualification = { "Labels", "Sports", "School", "Fun", "Work", "Family", "Chores"};
+
+        ArrayList<StateVO> listVOs = new ArrayList<>();
+
+        for (int i = 0; i < select_qualification.length; i++) {
+            StateVO stateVO = new StateVO();
+            stateVO.setTitle(select_qualification[i]);
+            stateVO.setSelected(false);
+            listVOs.add(stateVO);
+        }
+        MyAdapter myAdapter = new MyAdapter(TextNoteActivity.this, 0, listVOs);
+        mLabelSpinner.setAdapter(myAdapter);
     }
 
     private int getUserSharedId(int index) {
@@ -293,6 +314,8 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
                 Toast.makeText(this, "Unable to upload image.", Toast.LENGTH_SHORT).show();
             }
         }
+
+        BackendConnector.getNoteTags(this, this);
     }
 
     private boolean uploadBitmap(final Bitmap bitmap) {
@@ -339,5 +362,101 @@ public class TextNoteActivity extends AppCompatActivity implements ImageUploadCa
             }
         }
         setupUi();
+    }
+
+
+
+
+    public static class StateVO {
+        private String title;
+        private boolean selected;
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public void setSelected(boolean selected) {
+            this.selected = selected;
+        }
+    }
+
+    public static class MyAdapter extends ArrayAdapter<StateVO> {
+        private Context mContext;
+        private ArrayList<StateVO> listState;
+        private MyAdapter myAdapter;
+        private boolean isFromView = false;
+
+        public MyAdapter(Context context, int resource, List<StateVO> objects) {
+            super(context, resource, objects);
+            this.mContext = context;
+            this.listState = (ArrayList<StateVO>) objects;
+            this.myAdapter = this;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView,
+                                    ViewGroup parent) {
+            return getCustomView(position, convertView, parent);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return getCustomView(position, convertView, parent);
+        }
+
+        public View getCustomView(final int position, View convertView,
+                                  ViewGroup parent) {
+
+            final ViewHolder holder;
+            if (convertView == null) {
+                LayoutInflater layoutInflator = LayoutInflater.from(mContext);
+                convertView = layoutInflator.inflate(R.layout.spinner_item, null);
+                holder = new ViewHolder();
+                holder.mTextView = (TextView) convertView
+                        .findViewById(R.id.text);
+                holder.mCheckBox = (CheckBox) convertView
+                        .findViewById(R.id.checkbox);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.mTextView.setText(listState.get(position).getTitle());
+
+            // To check weather checked event fire from getview() or user input
+            isFromView = true;
+            holder.mCheckBox.setChecked(listState.get(position).isSelected());
+            isFromView = false;
+
+            if ((position == 0)) {
+                holder.mCheckBox.setVisibility(View.INVISIBLE);
+            } else {
+                holder.mCheckBox.setVisibility(View.VISIBLE);
+            }
+            holder.mCheckBox.setTag(position);
+            holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    int getPosition = (Integer) buttonView.getTag();
+
+
+                }
+            });
+            return convertView;
+        }
+
+        private class ViewHolder {
+            private TextView mTextView;
+            private CheckBox mCheckBox;
+        }
     }
 }
